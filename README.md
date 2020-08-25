@@ -1,1 +1,1 @@
-This is the frontend app for Team-1447 
+This is the backend app for Team-1447 
