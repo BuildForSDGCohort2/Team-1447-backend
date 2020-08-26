@@ -1,0 +1,38 @@
+{
+  "name": "devstory-backend",
+  "version": "1.0.0",
+  "description": "This is the backend of devstory",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BuildForSDGCohort2/Team-1447-backend.git"
+  },
+  "author": "FuFu Warrior",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BuildForSDGCohort2/Team-1447-backend/issues"
+  },
+  "homepage": "https://github.com/BuildForSDGCohort2/Team-1447-backend#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.22.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.2",
+    "node-cache": "^5.1.2",
+    "nodemailer": "^6.4.11",
+    "pg": "^8.3.2"
+  },
+  "devDependencies": {
+    "chalk": "^4.1.0",
+    "dotenv": "^8.2.0"
+  }
+}
