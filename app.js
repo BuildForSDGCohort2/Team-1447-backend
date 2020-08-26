@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
 // homepage
-app.get('/', () => {
+app.get('/', (req, res) => {
     res.status(200).json('Welcome to devstories');
 });
 

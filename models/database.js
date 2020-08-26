@@ -22,5 +22,4 @@ console.log(connectionString, 'j')
 pool.on('connect',()=> {console.log('working')});
 
 pool.query('SELECT * FROM users').then((result)=> {
-    console.log(result.rows);
 }).catch((err) => console.log(err));
