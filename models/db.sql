@@ -1,17 +1,17 @@
 CREATE TABLE IF NOT EXISTS
     users( 
         user_id SERIAL NOT NULL,
-        firstname VARCHAR(128) NOT NULL,
-        lastname VARCHAR(128) NOT NULL,
+        first_name VARCHAR(128) NOT NULL,
+        last_name VARCHAR(128) NOT NULL,
         date_of_birth DATE NOT NULL,
         email VARCHAR(128) NOT NULL,
         password TEXT NOT NULL,
-        username VARCHAR(128) NOT NULL,
-        phoneNumber VARCHAR(128) NOT NULL,
+        user_name VARCHAR(128) NOT NULL,
+        phone_number VARCHAR(128) NOT NULL,
         gender VARCHAR(128) NOT NULL,
         is_admin BOOLEAN NOT NULL,
         avatar_url TEXT NOT null,
-        UNIQUE(username, email, phoneNumber,user_id),
+        UNIQUE(user_name, email, phone_number,user_id),
         PRIMARY KEY(user_id)
     );
 
@@ -21,21 +21,21 @@ CREATE TABLE IF NOT EXISTS
         article_header TEXT NOT NULL,
         article_body TEXT NOT NULL,
         posted_by INT NOT NULL,
-    --    FOREIGN KEY(posted_by) REFERENCES users(user_id),
         FOREIGN KEY (posted_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
-        date_of_pub TIMESTAMP
+        date_of_pub TIMESTAMP NOT NULL
     );
 CREATE TABLE IF NOT EXISTS
     comments(
         comment_id SERIAL PRIMARY KEY NOT NULL UNIQUE,
         comment TEXT NOT NULL,
         posted_on INT NOT NULL,
-        FOREIGN KEY (posted_on) REFERENCES article(article_id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (posted_on) REFERENCES article(article_id) ON DELETE CASCADE ON UPDATE CASCADE
     );
 CREATE TABLE IF NOT EXISTS
     avatar(
         avatar_id SERIAL PRIMARY KEY NOT NULL,
         avatar_url TEXT NOT NULL,
+        posted_by INT NOT NULL,
         FOREIGN KEY (posted_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     );
 CREATE TABLE IF NOT EXISTS

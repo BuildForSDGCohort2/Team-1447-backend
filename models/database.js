@@ -17,9 +17,6 @@ const pool = new Pool({
     connectionString
 });
 
-console.log(connectionString, 'j')
+pool.on('connect',() => console.log('working'));
 
-pool.on('connect',()=> {console.log('working')});
-
-pool.query('SELECT * FROM users').then((result)=> {
-}).catch((err) => console.log(err));
+module.exports = pool;
