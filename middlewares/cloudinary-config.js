@@ -8,6 +8,8 @@ cloudinary.config({
     
 });
 
+console.log("Hit the file")
+
 exports.uploads = (file, folder) => {
     return new Promise(resolve => {
         cloudinary.uploader.upload(file, (result) => {

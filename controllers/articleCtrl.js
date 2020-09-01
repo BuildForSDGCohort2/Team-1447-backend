@@ -13,7 +13,7 @@ class Article{
     static async createArticle(req, res) {
 
         try{
-            //! THE DATE OF PUB SHOULD ONE USET JAVASRIPT OR POSTGRES
+            //! THE DATE OF PUB SHOULD ONE BE SET BY JAVASRIPT OR POSTGRES
             const {articleTitle, articleBody, dateOfPub, authorId} = req.body;
         
             const query =  `INSERT INTO article(article_header, article_body, date_of_pub, posted_by) VALUES($1, $2, $3,$4) RETURNING *`
@@ -56,9 +56,12 @@ class Article{
 
     static async getAllArticle(req, res) {
         //! This is where i will do the join statement(inner or outer) to join to table together
+        const userId = req.params.userId
+        console.log(userId);
         try {
 
-            const result = await pool.query("SELECT * FROM article");  
+            // const result = await pool.query("SELECT article_header, article_body, date_of_pub, avatar_url FROM article INNER JOIN users ON user_id = posted_by WHERE posted_by=$1", [userId]);  
+            const result = await pool.query("SELECT * FROM article WHERE posted_by=$1", [userId]); 
             if (result.rowCount > 0) {
                 res.status(200).json({
                     status: "success",
@@ -210,8 +213,11 @@ class Article{
 
      static async deleteAllArticle(req,res) {
          try {
+             const userId = req.params.userId;
              //! A join to make article and media table delete the assoc data
-            const result = await pool.query("DELETE FROM article");
+            // const result = await pool.query("DELETE FROM article INNER JOIN media ON article.posted_by= media.posted_by ");
+            const result = await pool.query("DELETE FROM article WHERE posted_by=$1", [userId]);
+            // const result = await pool.query("DELETE FROM media WHERE posted_by=$1", [userId]);
             if(result.rowCount > 0){
                 res.status(200).json({
                     status: "success",

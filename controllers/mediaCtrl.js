@@ -10,58 +10,120 @@ class MediaCtrl{
      * @memberof MediaCtrl
      */
 
-    static async createMedia(req,res){
-        const uploader = async (path) => await cloudinary.uploads(path, 'My Assets');
+    static async createMedia(req,res) {
         
-        if(req.method === 'POST') {
-            const url = [];
-            const {path} = req.file;
-            const newPath = await uploader(path);
-            url.push(newPath);
-            fs.unlinkSync(path);
+        try {
+            const uploader = async (path) => await cloudinary.uploads(path, 'My Assets');
 
-            const gif_link = url[0].url;
-            const query = "INSERT INTO media(f) VALUES() RETURNING *"
-        }
+            if(req.method === 'POST') {
+                
+                // console.log(req.extension, req.mediaType, req.file, req.body, "This is it");
+                // const url = [];
+                let url;
+                const {path} = req.file;
+                const newPath = await uploader(path);
+                url = newPath;
+                // url.push(newPath);
+                fs.unlinkSync(path);
+    
+                const mediaUrl = url.url;
+                const ext = req.extension;
+                const mediaType = req.mediaType;
+                const postedOn = "2009-03-03";
 
-        if (req.method === 'POST') {
-        const url = [];
-        const {path} = req.file;
-        const newPath = await uploader(path)
-        url.push(newPath);
-        fs.unlinkSync(path);
-        
-        if (req.employee) {
-            const gif_link = url[0].url;
-            const query = 'INSERT INTO gifs (gif_link) VALUES($1) RETURNING*'
-            const value = [gif_link]
-            pool.query('SELECT * FROM gifs where gif_link = $1', [gif_link])
-            .then((resultCheck) => {
-                if (resultCheck > 0) {
-                    return res.status(400).json({status: 400, message: 'Record already exist'})
+    
+                const query = "INSERT INTO media(media_ext, media_url, media_type, posted_on) VALUES( $1, $2, $3, $4 ) RETURNING *";
+                const values = [ext, mediaUrl, mediaType, postedOn ];
+
+                const result = await pool.query(query, values);
+                if (result.rowCount > 0) {
+                    res.status(201).json({
+                        status: "success",
+                        message: "Media was successfully posted",
+                        data: {
+                            mediaId : result.rows[0].media_id,
+                            createdOn: result.rows[0].posted_on,
+                            title: result.rows[0].media_title,
+                            mediaUrl: result.rows[0].media_url
+                        }
+                    })
                 }
             }
-        ).catch((error) => {res.status(500).json({error : `Something Unexpected Happen ${error}`})});
+        } catch (error) {
+            res.status(500).json({
+                status: "error",
+                message: "Something went wrong",
+                error
+            })
+        }
         
-        pool.query(query,value)
-        .then((result) => {
-            res.status(201).json({status:201, data: result.rows[0]}) 
-        }).catch((error) => { res.status(500).json({status: 400, message: `Something Unexpected happen ${error}`})});
     }
-        else {
-            return  res.status(400).json({status: 400, message: 'You are not authorize to use this routes'})
+
+        /**
+     * @static
+     * @params {Object} req
+     * @params {Object} res
+     * @returns JSON
+     * @memberof MediaCtrl
+     */
+
+        static async getOneGif(req,res) {
+            try {
+                const {mediaId} = req.body;
+                //! join statement to join comments and media id together
+                // const res = await pool.query("SELECT comment, date_of_pub, likes FROM comments INNER JOIN media ON media_id = posted_on " )
+                const result = await pool.query( "SELECT * FROM media WHERE media_id=$1 ", [mediaId]);
+                const comment = await pool.query("SELECT * FROM comment W")
+                if (result.rowCount > 1) {
+                    res.status(200).json({
+                        status: "success",
+                        data: {
+                            id: result.rows[0].media_id,
+                            createdOn: result.rows[0].posted_on,
+                            title: result.rows[0].media_title,
+                            //? comments: arrays of all comments of this media id
+                        }
+                    });
+                }
+            } catch (error) {
+                res.status(500).json({
+                    status: "error",
+                    message: "Something went wrong"
+                })
             }
-        
-    
-    
-        } else {
-        res.status(405).json({
-            err: `${req.method} method not allowed`
-        })}
-        
-        
-        
-    }
+        }
+
+           /**
+     * @static
+     * @params {Object} req
+     * @params {Object} res
+     * @returns JSON
+     * @memberof MediaCtrl
+     */
+       
+     static async deleteOneMedia(req, res){
+        try {
+            const mediaId = Number(req.params.mediaId);
+            const result = await pool.query( "DELETE FROM media WHERE media_id=$1", [mediaId]);
+           
+            if (result.rowCount > 0) {
+                res.status(200).json({
+                    message: "Deleted successfully"
+                });
+            }else{
+                res.status(404).json({
+                    message: "Article does not exist"
+                });
+            }
+        } catch (error) {
+            res.status(500).json({
+                status: "error",
+                data: {
+                    message: "Something went wrong"
+                }
+            });
+        }    
+     }
 }
 
-module.exports = MediaCtrl
+module.exports = MediaCtrl;
