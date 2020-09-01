@@ -35,7 +35,7 @@ class UserCtrl{
                 if (resultCheck.rowCount > 0){
                     res.status(409).json({
                         status: "error",
-                        data: { message: "User already exists with this email"}
+                         message: "User already exists with this email"
                     })
                 }
                 else{
@@ -113,7 +113,7 @@ class UserCtrl{
             if(result.rowCount === 0){
                res.status("404").json({
                    status: "error",
-                   data:{ message: "Your Email/Username and password is Incorrect" }
+                   message: "Your Email/Username and password is Incorrect" 
                });
             }else if(compare){
                 if(req.headers["authorization"]) {
@@ -149,7 +149,36 @@ class UserCtrl{
                     status: "error",
                     message: "Something went Wrong"
                 }
-            })
+            });
+        }
+    }
+
+    static async profile(req, res){
+        try {
+            
+            const userId = req.params.userId;
+            const query = `SELECT first_name, last_name, email, date_of_birth, avatar_url, is_admin, 
+                           password, phone_number, gender, user_name FROM users WHERE email=$1`
+
+            const result = await pool.query(query, [userId]);
+            if (result.rowCount > 0) {
+                res.status(200).json({
+                    status: "success",
+                    data: {
+                        result: result.rows
+                    }
+                });
+            }else{
+                res.status(404).json({
+                    status: "error",
+                    message: "Unable to fetch user data"
+                });
+            }
+        } catch (error) {
+            res.status(500).json({
+                status: "error",
+                message: "Something went wrong"
+            });
         }
     }
 }

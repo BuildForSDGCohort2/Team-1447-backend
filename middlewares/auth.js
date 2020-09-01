@@ -24,7 +24,7 @@ class Auth{
           }
           req.user = decode.user_name;
           req.admin = decode.is_admin;
-          req.id = decode.id;
+          req.email = decode.email;
           next();
         });
       }
