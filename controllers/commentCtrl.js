@@ -1,8 +1,15 @@
 const pool = require("../models/database");
 
 class CommentCtrl {
-    constructor() {
-    }
+    
+    /**
+     * @static
+     * @params {Object} req
+     * @params {Object} res
+     * @returns Appropriate JSON Response with Status and Data
+     * @memberof CommentCtrl
+     */
+
     static async createComment(req, res) {
         try {
             const { comment, postedOn, postedBy } = req.body;
@@ -32,6 +39,14 @@ class CommentCtrl {
         }
     }
 
+    /**
+     * @static
+     * @params {Object} req
+     * @params {Object} res
+     * @returns Appropriate JSON Response with Status and Data
+     * @memberof CommentCtrl
+     */
+
     static async  getAllComments(req, res) {
 
         try {
@@ -59,6 +74,14 @@ class CommentCtrl {
          
     }
 
+    /**
+     * @static
+     * @params {Object} req
+     * @params {Object} res
+     * @returns Appropriate JSON Response with Status and Data
+     * @memberof CommentCtrl
+     */
+
     static async getOneComment(req,res) {
 
         try {
@@ -84,6 +107,14 @@ class CommentCtrl {
             })
         }
     }
+
+    /**
+     * @static
+     * @params {Object} req
+     * @params {Object} res
+     * @returns Appropriate JSON Response with Status and Data
+     * @memberof CommentCtrl
+     */
 
     static async deleteOneComment(req, res) {
         try {
