@@ -1,5 +1,5 @@
-const pool = require('../models/database');
-const cloudinary = require('../middlewares/cloudinary-config');
+const pool = require("../models/database");
+const cloudinary = require("../middlewares/cloudinary-config");
 
 class MediaCtrl{
      /**
@@ -13,9 +13,9 @@ class MediaCtrl{
     static async createMedia(req,res) {
         
         try {
-            const uploader = async (path) => await cloudinary.uploads(path, 'My Assets');
+            const uploader = async (path) => await cloudinary.uploads(path, "My Assets");
 
-            if(req.method === 'POST') {
+            if(req.method === "POST") {
                 
                 // console.log(req.extension, req.mediaType, req.file, req.body, "This is it");
                 // const url = [];
