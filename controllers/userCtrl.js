@@ -219,8 +219,8 @@ class UserCtrl{
                     }
 
                     // Create a mail transport
-                    let transporter = nodemailer.createTransport({
-                    service: 'gmail',
+                    let transporter = nodeMailer.createTransport({
+                    service: 'smtp.gmail',
                     port: 465,
                     secure: true,
                     auth: {
@@ -282,6 +282,7 @@ class UserCtrl{
                 const result = await pool.query("UPDATE users SET password=$1  WHERE user_id=$2 RETURNING *", [hash, id]);
                 
                 if (result.rowCount > 0) {
+                    res.setHeader("Content-Encoding", "gzip");
                     res.status(200).json({
                         status: "success",
                         message: "Successfully Changed your password"
