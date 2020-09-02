@@ -61,7 +61,7 @@ class Article{
         try {
 
             // const result = await pool.query("SELECT article_header, article_body, date_of_pub, avatar_url FROM article INNER JOIN users ON user_id = posted_by WHERE posted_by=$1", [userId]);  
-            const result = await pool.query("SELECT * FROM article WHERE posted_by=$1", [userId]); 
+            const result = await pool.query("SELECT * FROM article ORDER BY date_of_pub DESC WHERE posted_by=$1" , [userId]); 
             if (result.rowCount > 0) {
                 res.status(200).json({
                     status: "success",
@@ -69,14 +69,15 @@ class Article{
                         result: result.rows
                     }
                 })
-            } else {
-                res.status(404).json({
-                    status: "error",
-                    data: {
-                        message: "Articles not found"
-                    }
-                });
             }
+
+            res.status(404).json({
+                status: "error",
+                data: {
+                    message: "Articles not found"
+                }
+            });
+        
         } catch (error) {
             res.status(500).json({
                 status: "error",
@@ -111,17 +112,18 @@ class Article{
                         authorId: result.rows.posted_by
                     }]
                 });
-            }else{
-                res.status(404).json({
-                    status: "error",
-                    message: "Couldn\"t find article"
-                })
             }
+
+            res.status(404).json({
+                status: "error",
+                message: "Couldn\"t find article"
+            });
+           
         } catch (error) {
             res.status(500).json({
                 status: "error",
                 message: "Something went wrong"
-            })
+            });
         }
     }
 
@@ -154,12 +156,13 @@ class Article{
                     title: result.rows.article_header,
                     article: result.rows.article_body
                 });
-            }else{
-                res.status(404).json({
-                    status: error,
-                    message: "Article not updated"
-                });
             }
+
+            res.status(404).json({
+                status: error,
+                message: "Article not updated"
+            });
+           
         } catch (error) {
             res.status(500).json({
                 status: "error",
@@ -188,11 +191,12 @@ class Article{
                 res.status(200).json({
                     message: "Article has been deleted successfully"
                 });
-            }else{
-                res.status(404).json({
-                    message: "Article does not exist"
-                });
             }
+
+            res.status(404).json({
+                message: "Article does not exist"
+            });
+           
         } catch (error) {
             res.status(500).json({
                 status: "error",
@@ -223,12 +227,13 @@ class Article{
                     status: "success",
                     message: "All article deleted"
                 });
-            }else{
-                res.status(404).json({
-                    status: "error",
-                    message: "All articles have already been deleted"
-                })
             }
+
+            res.status(404).json({
+                status: "error",
+                message: "All articles have already been deleted"
+            });
+          
         } catch (error) {
             res.status(500).json({
                 status: "error",

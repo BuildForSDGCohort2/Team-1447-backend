@@ -256,7 +256,6 @@ class UserCtrl{
                 });
             }
         }catch (error) {
-
             res.status(500).json({
                 status: "error",
                 message: "Something went wrong"
@@ -298,7 +297,7 @@ class UserCtrl{
             res.status(500).json({
                 status: "error",
                 message: "Something went wrong"
-            })
+            });
         }
     }
     
@@ -313,19 +312,19 @@ class UserCtrl{
     static async resetPassword(req, res) {
         try{
             const id = req.id
-            const {retryOldPassword} = req.body;
-            const {newPassword} = req.body
-            if (retryOldPassword && newPassword) {
-                const result = pool.query("SELECT password FROM users WHERE user_id=$1", [id]);
-                if (result > 0) {
-                    const compare = await bcrypt.compare(retryOldPassword, resutl.rows[0].password)
+            const {oldPassword} = req.body;
+            const {retryNewPassword} = req.body
+            if (oldPassword && retryNewPassword) {
+                const result = await pool.query("SELECT password FROM users WHERE user_id=$1", [id]);
+                if (result.rowCount > 0) {
+                    const compare = await bcrypt.compare(oldPassword, result.rows[0].password)
                     if (compare) {
                         const salt = await bcrypt.genSalt(10);
-                        const hash = await bcrypt.hash(newPassword, salt)
+                        const hash = await bcrypt.hash(retryNewPassword, salt)
                         
                         if (hash) {
                             const result = await pool.query("UPDATE users SET password=$1 WHERE user_id=$2", [hash, id]);
-                            if (result > 0) {
+                            if (result.rowCount > 0) {
                                 res.status(200).json({
                                     status: "success",
                                     message: "Your password has been changed successfully"
@@ -333,7 +332,7 @@ class UserCtrl{
                             }
                             res.status(404).json({
                                 status: "error",
-                                message: "Input Somthin"
+                                message: "Password has not been changed"
                             })
                         }
                     } 
