@@ -6,7 +6,7 @@ class MediaCtrl{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof MediaCtrl
      */
 
@@ -30,10 +30,11 @@ class MediaCtrl{
                 const ext = req.extension;
                 const mediaType = req.mediaType;
                 const postedOn = "2009-03-03";
+                const mediaCaption = "Lorem"
 
     
-                const query = "INSERT INTO media(media_ext, media_url, media_type, posted_on) VALUES( $1, $2, $3, $4 ) RETURNING *";
-                const values = [ext, mediaUrl, mediaType, postedOn ];
+                const query = "INSERT INTO media(media_ext, media_url, media_type, posted_on, media_caption) VALUES( $1, $2, $3, $4 ) RETURNING media_id, media_title, media_url, posted_on";
+                const values = [ext, mediaUrl, mediaType, postedOn , mediaCaption];
 
                 const result = await pool.query(query, values);
                 if (result.rowCount > 0) {
@@ -43,11 +44,16 @@ class MediaCtrl{
                         data: {
                             mediaId : result.rows[0].media_id,
                             createdOn: result.rows[0].posted_on,
-                            title: result.rows[0].media_title,
+                            caption: result.rows[0].media_title,
                             mediaUrl: result.rows[0].media_url
                         }
-                    })
+                    });
                 }
+
+                res.status(404).json({
+                    status: "error",
+                    message: "Media could not be posted"
+                });
             }
         } catch (error) {
             res.status(500).json({
@@ -63,7 +69,7 @@ class MediaCtrl{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof MediaCtrl
      */
 
@@ -73,7 +79,7 @@ class MediaCtrl{
                 //! join statement to join comments and media id together
                 // const res = await pool.query("SELECT comment, date_of_pub, likes FROM comments INNER JOIN media ON media_id = posted_on " )
                 const result = await pool.query( "SELECT * FROM media WHERE media_id=$1 ", [mediaId]);
-                const comment = await pool.query("SELECT * FROM comment W")
+              
                 if (result.rowCount > 1) {
                     res.status(200).json({
                         status: "success",
@@ -85,6 +91,12 @@ class MediaCtrl{
                         }
                     });
                 }
+
+                res.status(404).json({
+                    status: "error",
+                    message: "Media not found"
+                });
+
             } catch (error) {
                 res.status(500).json({
                     status: "error",
@@ -97,7 +109,7 @@ class MediaCtrl{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof MediaCtrl
      */
        
@@ -110,11 +122,12 @@ class MediaCtrl{
                 res.status(200).json({
                     message: "Deleted successfully"
                 });
-            }else{
-                res.status(404).json({
-                    message: "Article does not exist"
-                });
             }
+
+            res.status(404).json({
+                message: "Media does not exist"
+            });
+           
         } catch (error) {
             res.status(500).json({
                 status: "error",

@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS
         date_of_pub TIMESTAMP NOT NULL,
         FOREIGN KEY (posted_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     );
+
 CREATE TABLE IF NOT EXISTS
     comments(
         comment_id SERIAL PRIMARY KEY NOT NULL UNIQUE,
@@ -33,6 +34,7 @@ CREATE TABLE IF NOT EXISTS
         FOREIGN KEY (posted_on) REFERENCES article(article_id) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY (posted_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
     );
+
 CREATE TABLE IF NOT EXISTS
     avatar(
         avatar_id SERIAL PRIMARY KEY NOT NULL,
@@ -40,6 +42,7 @@ CREATE TABLE IF NOT EXISTS
         posted_by INT NOT NULL,
         FOREIGN KEY (posted_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     );
+
 CREATE TABLE IF NOT EXISTS
     hyperlink(
         hyperlink_id SERIAL PRIMARY KEY NOT NULL UNIQUE,
@@ -49,9 +52,11 @@ CREATE TABLE IF NOT EXISTS
         FOREIGN KEY(posted_on) REFERENCES article(article_id) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY(posted_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
     );
+    
 CREATE TABLE IF NOT EXISTS
     media(
         media_id SERIAL PRIMARY KEY NOT NULL UNIQUE,
+        media_caption VARCHAR(200),
         media_type VARCHAR(128),
         media_ext VARCHAR(128),
         media_url TEXT,
