@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const pool = require("../models/database");
+const nodeMailer = require("nodemailer")
 require("dotenv").config();
 
 // Sign Up ctrl
@@ -9,7 +10,7 @@ class UserCtrl{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof UserCtrl
      */
      
@@ -54,7 +55,7 @@ class UserCtrl{
                     const {is_admin} = response.rows[0];
                     const {user_name} = response.rows[0];
 
-                    jwt.sign({ user_name, is_admin, email}, process.env.TOKEN_SECRET, { expiresIn: "365d" }, (err, token) => {
+                    jwt.sign({ user_name, is_admin, email, user_id}, process.env.TOKEN_SECRET, { expiresIn: "365d" }, (err, token) => {
                             if(err){
                                 res.status(400).json({
                                     message: "Unable to generate Token"
@@ -87,7 +88,7 @@ class UserCtrl{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof UserCtrl
      */
 
@@ -116,27 +117,26 @@ class UserCtrl{
                    message: "Your Email/Username and password is Incorrect" 
                });
             }else if(compare){
-                if(req.headers["authorization"]) {
-                    res.status(200).json({
-                        status: "success",
-                        data:{
-                            message: "You have logged in successfully"
+                // The issue with this is if the token has expired
+                // const token = req.headers["authorization"].split(" ")[1]
+                // if (token) {
+                //     res.status(200).json({
+                //         status: "success",
+                //         data:{
+                //             message: "You have logged in successfully"
+                //         } 
+                //     })
+                jwt.sign({ username, is_admin, user_id, email},
+                    process.env.TOKEN_SECRET, { expiresIn: "365d" }, (err, token) => {
+                        res.status(201).json({
+                        data: {
+                            token,
+                            message: "You have logged in successfully",
+                            user: result.rows
                         }
-                    })
-                }else{
-                    jwt.sign({ username, is_admin, user_id, email},
-                        process.env.TOKEN_SECRET, { expiresIn: "365d" }, (err, token) => {
-                            res.status(201).json({
-                            data: {
-                                token,
-                                message: "You have logged in successfully",
-                                user: result.rows
-                            }
-                            });
                         });
-                }     
-    
-            }else{
+                    });
+                }else{
                 res.status(404).json({
                     data:{
                         message: "Your Email/Username and password is Incorrect"
@@ -153,6 +153,14 @@ class UserCtrl{
         }
     }
 
+     /**
+     * @static
+     * @params {Object} req
+     * @params {Object} res
+     * @returns Appropriate JSON Response with Status and Data
+     * @memberof UserCtrl
+     */
+
     static async profile(req, res){
         try {
             
@@ -160,8 +168,10 @@ class UserCtrl{
             const query = `SELECT first_name, last_name, email, date_of_birth, avatar_url, is_admin, 
                            password, phone_number, gender, user_name FROM users WHERE email=$1`
 
-            const result = await pool.query(query, [userId]);
+            const result = await pool.query( query, [userId]);
+
             if (result.rowCount > 0) {
+
                 res.status(200).json({
                     status: "success",
                     data: {
@@ -169,16 +179,179 @@ class UserCtrl{
                     }
                 });
             }else{
+
                 res.status(404).json({
                     status: "error",
                     message: "Unable to fetch user data"
                 });
             }
         } catch (error) {
+
             res.status(500).json({
                 status: "error",
                 message: "Something went wrong"
             });
+        }
+    }
+
+    /**
+     * @static
+     * @params {Object} req
+     * @params {Object} res
+     * @returns Appropriate JSON Response with Status and Data 
+     * @memberof UserCtrl
+     */
+
+    static async forgotPassword(req, res) {
+        try{
+            const {email} = req.body;
+
+            const result = pool.query("SELECT email FROM users WHERE email=$1", [email]);
+
+            if ((await result).rowCount > 0) {
+                // Create a jwt token which expires in 15mins
+                jwt.sign({email, user_id}, process.env.TOKEN_SECRET, {expiresIn: "900s"}, (error, token) => {
+                    if (error) {
+                        res.status(400).json({
+                           status: "error",
+                           message: "Unable to generate token" 
+                        });
+                    }
+
+                    // Create a mail transport
+                    let transporter = nodeMailer.createTransport({
+                    service: 'smtp.gmail',
+                    port: 465,
+                    secure: true,
+                    auth: {
+                      user: process.env.EMAIL,
+                      pass: process.env.EMAIL_PASSWORD
+                    }
+                });
+
+                  // Mail information for recipient
+                  var mailOptions = {
+                    from: 'hakanboysidol@gmail.com',
+                    to: email,
+                    subject: 'Reset Password Link - Devstory',
+                    text: `<p>You requested to reset your password. 
+                    Click <a href="https://devstory.netlify.app/Politico/changepassword.html?token=${token}">here</a> to reset it</p><br/>
+                    <p>This token will expire in 15 minutes</p><p>Pls, ignore if you are not the one</p>. <p>Contact mail us @ politicoxpress@gmail.com for help</p>`
+                  };
+
+                  // Send the E-mail
+                  transporter.sendMail(mailOptions, function(error, info){
+                    if (error) {
+                      console.log(error);
+                    } else {
+                      console.log('Email sent: ' + info.response);
+                    }
+                  });
+                });
+            }else{
+
+                res.status(404).json({
+                    status: "error",
+                    message: "No Email associated with Account"
+                });
+            }
+        }catch (error) {
+
+            res.status(500).json({
+                status: "error",
+                message: "Something went wrong"
+            });
+        }
+    }
+
+    /**
+     * @static
+     * @params {Object} req
+     * @params {Object} res
+     * @returns Appropriate JSON Response with Status and Data 
+     * @memberof UserCtrl
+     */
+
+    static async changePassword(req, res) {
+        try {
+            const {password} = req.body;
+            const id = req.id
+            const salt = await bcrypt.genSalt(10);
+            const hash = await bcrypt.hash(password, salt);
+            if (hash) {
+                const result = await pool.query("UPDATE users SET password=$1  WHERE user_id=$2 RETURNING *", [hash, id]);
+                
+                if (result.rowCount > 0) {
+                    res.setHeader("Content-Encoding", "gzip");
+                    res.status(200).json({
+                        status: "success",
+                        message: "Successfully Changed your password"
+                    });
+                }
+
+                res.status(404).json({
+                    status: "error",
+                    message: "Your password could not be changed"
+                });
+            }
+        } catch (error) {
+            res.status(500).json({
+                status: "error",
+                message: "Something went wrong"
+            })
+        }
+    }
+    
+    /**
+     * @static
+     * @params {Object} req
+     * @params {Object} res
+     * @returns Appropriate JSON Response with Status and Data 
+     * @memberof UserCtrl
+     */
+
+    static async resetPassword(req, res) {
+        try{
+            const id = req.id
+            const {retryOldPassword} = req.body;
+            const {newPassword} = req.body
+            if (retryOldPassword && newPassword) {
+                const result = pool.query("SELECT password FROM users WHERE user_id=$1", [id]);
+                if (result > 0) {
+                    const compare = await bcrypt.compare(retryOldPassword, resutl.rows[0].password)
+                    if (compare) {
+                        const salt = await bcrypt.genSalt(10);
+                        const hash = await bcrypt.hash(newPassword, salt)
+                        
+                        if (hash) {
+                            const result = await pool.query("UPDATE users SET password=$1 WHERE user_id=$2", [hash, id]);
+                            if (result > 0) {
+                                res.status(200).json({
+                                    status: "success",
+                                    message: "Your password has been changed successfully"
+                                })
+                            }
+                            res.status(404).json({
+                                status: "error",
+                                message: "Input Somthin"
+                            })
+                        }
+                    } 
+                    res.status(404).json({
+                        status: "error",
+                        message: "Password is not correct"
+                    }) 
+                }
+                res.status(404).json({
+                    status: "error",
+                    message: "Account doesn't exists"
+                })
+            }
+        }catch (error) {
+            res.status(500).json({
+                status: "error",
+                message: "Something went wrong"
+            })
         }
     }
 }

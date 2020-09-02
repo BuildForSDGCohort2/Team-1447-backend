@@ -6,7 +6,7 @@ class Article{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof ArticleCtrl
      */
     
@@ -50,7 +50,7 @@ class Article{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof ArticleCtrl
      */
 
@@ -91,7 +91,7 @@ class Article{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof ArticleCtrl
      */
 
@@ -129,7 +129,7 @@ class Article{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof ArticleCtrl
      */
 
@@ -175,7 +175,7 @@ class Article{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof ArticleCtrl
      */
 
@@ -207,7 +207,7 @@ class Article{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof ArticleCtrl
      */
 

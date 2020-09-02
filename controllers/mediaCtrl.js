@@ -6,7 +6,7 @@ class MediaCtrl{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof MediaCtrl
      */
 
@@ -63,7 +63,7 @@ class MediaCtrl{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof MediaCtrl
      */
 
@@ -97,7 +97,7 @@ class MediaCtrl{
      * @static
      * @params {Object} req
      * @params {Object} res
-     * @returns JSON
+     * @returns Appropriate JSON Response with Status and Data
      * @memberof MediaCtrl
      */
        
