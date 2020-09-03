@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const Auth = require("../middlewares/auth");
+const Auth = require("../../middlewares/auth");
 const Comment = require("../controllers/commentCtrl");
 
 router.post(":articleId/comment", Auth.verifyUser, Comment.createComment);

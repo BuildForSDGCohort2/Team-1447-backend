@@ -1,7 +1,7 @@
 const router = require("express").Router(); 
-const Auth = require("../middlewares/auth");
+const Auth = require("../../middlewares/auth");
 const ArticleCtrl= require("../controllers/articleCtrl");
-const Cache = require("../middlewares/cache");
+const Cache = require("../../middlewares/cache");
 
 router.post("/create/article", Auth.verifyUser, ArticleCtrl.createArticle, Cache.clearCache);
 router.get("/articles/feed", Auth.verifyUser, Cache.getCache, ArticleCtrl.getAllArticle, Cache.setCache);

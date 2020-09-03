@@ -1,6 +1,6 @@
 const router = require("express").Router();
-const multer = require('../middlewares/multer-config');
-const Cache = require("../middlewares/cache");
+const multer = require('../../middlewares/multer-config');
+const Cache = require("../../middlewares/cache");
 const MediaCtrl = require("../controllers/mediaCtrl");
 
 router.post("/media/upload", multer.single("image"), MediaCtrl.createMedia, Cache.clearCache);

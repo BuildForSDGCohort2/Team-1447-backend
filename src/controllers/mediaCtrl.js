@@ -1,5 +1,5 @@
 const pool = require("../models/database");
-const cloudinary = require("../middlewares/cloudinary-config");
+const cloudinary = require("../../middlewares/cloudinary-config");
 
 class MediaCtrl{
      /**
