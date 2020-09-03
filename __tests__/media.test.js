@@ -1,4 +1,4 @@
-const app = require('../app');
+const app = require('../src/app');
 const cloudinary = require('../middlewares/cloudinary-config');
 
 describe( "MediaCtrl", () => {

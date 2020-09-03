@@ -5,7 +5,7 @@ const MIMES_TYPE = {
     "image/png": "png",
     "image/gif": "gif",
 };
-let counter = 0;
+
 let name = "devstory"
 const storage = multer.diskStorage({
     // Set file destination
@@ -33,6 +33,7 @@ const fileFilter = (req, file, cb) => {
 
 module.exports = multer({
     storage,
+    // limits is 8 MB in size
     limits: {fileSize: 8 * (1024 * 1024)},
     fileFilter
 })
