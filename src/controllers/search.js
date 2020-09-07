@@ -1,31 +1,33 @@
 const pool = require("../models/database");
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
     
     try {
-        const {author} = req.param
+        const {q} = req.query;
         
-        const query = "SELECT first_name, last_name, username FROM users WHERE first_name=$1 OR last_name=$2 OR username";
-        const values = [author, author, author];
-        const result = pool.query( query , values); 
+        const query = "SELECT first_name, last_name, user_name FROM users WHERE first_name=$1 OR last_name=$2 OR user_name=$3";
+        const values = [q, q, q];
+        const result = await pool.query( query , values); 
        
-        if (result > 0) {
+        if (result.rowCount > 0) {
             res.status(200).json({
                 status: "success",
                 data: {
                     result: result.rows
                 }
             });
+        }else{
+            res.status(404).json({
+                status: "error",
+                message: "User not found"
+            });
         }
-    
-        res.status(404).json({
-            status: "error",
-            message: "User not found"
-        });
     } catch (error) {
+        console.log(error)
         res.status(500).json({
           status: "error",
-          message: "Something went wrong"  
-        })
+          message: "Something went wrong",
+          error
+        });
     }
 }

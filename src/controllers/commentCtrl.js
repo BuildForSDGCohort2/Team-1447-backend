@@ -10,11 +10,11 @@ class CommentCtrl {
      * @memberof CommentCtrl
      */
 
-    static async createComment(req, res) {
+    static async createComment(req, res, next) {
         try {
-            const { comment, postedOn, postedBy } = req.body;
-            const query = "INSERT INTO comments(comment, posted_on, posted_by) VALUES($1, $2, $3) RETURNING* ";
-            const values = [comment, postedOn, postedBy];
+            const { comment, articlePostedOn, postedBy, dateOfPub, mediaPostedOn } = req.body;
+            const query = "INSERT INTO comments(comment, article_posted_on, posted_by, date_of_pub, media_posted_on) VALUES($1, $2, $3, $4, $5) RETURNING *";
+            const values = [ comment, articlePostedOn, postedBy, dateOfPub, mediaPostedOn ];
             const result = await pool.query(query, values);
             if (result.rowCount > 0) {
                 res.status(201).json({
@@ -37,6 +37,7 @@ class CommentCtrl {
                 message: "Something went wrong"
             });
         }
+        next();
     }
 
     /**
@@ -47,31 +48,33 @@ class CommentCtrl {
      * @memberof CommentCtrl
      */
 
-    static async  getAllComments(req, res) {
+    static async  getAllMediaComments(req, res, next) {
 
         try {
-            const {articleId} = req.params;
-            const result = await pool.query("SELECT * FROM comments WHERE posted_on=$1", [articleId]);
+            const {mediaId} = req.params;
+            const result = await pool.query("SELECT * FROM comments WHERE media_posted_on=$1", [mediaId]);
+            console.log(result.rows);
             if (result.rowCount > 0) {
                 res.status(200).json({
                     status: "success",
                     data: {
                         result: result.rows
                     }
-                })
+                });
             } else {
                 res.status(404).json({
                     status: "error",
-                    message: "Something went wrong"
-                })
+                    message: "Media doesn't exist"
+                });
             }
         } catch (error) {
             res.status(500).json({
                 status: "error",
-                message: "Something went wrong"
-            })
+                message: "Something went wrong",
+                error
+            });
         }
-         
+        next();
     }
 
     /**
@@ -82,7 +85,44 @@ class CommentCtrl {
      * @memberof CommentCtrl
      */
 
-    static async getOneComment(req,res) {
+    static async  getAllArticleComments(req, res, next) {
+
+        try {
+            const {articleId} = req.params;
+            const result = await pool.query("SELECT * FROM comments WHERE article_posted_on=$1", [articleId]);
+            if (result.rowCount > 0) {
+                res.status(200).json({
+                    status: "success",
+                    data: {
+                        result: result.rows
+                    }
+                });
+            } else {
+                res.status(404).json({
+                    status: "error",
+                    message: "Article doesn't exist"
+                });
+            }
+        } catch (error) {
+            res.status(500).json({
+                status: "error",
+                message: "Something went wrong",
+                error
+            });
+        }
+         next();
+    }
+
+
+    /**
+     * @static
+     * @params {Object} req
+     * @params {Object} res
+     * @returns Appropriate JSON Response with Status and Data
+     * @memberof CommentCtrl
+     */
+
+    static async getOneComment(req, res, next) {
 
         try {
             const {commentId} = req.params;
@@ -104,8 +144,9 @@ class CommentCtrl {
             res.status(500).json({
                 status: "error",
                 message: "Something went wrong"
-            })
+            });
         }
+        next();
     }
 
     /**
@@ -116,12 +157,48 @@ class CommentCtrl {
      * @memberof CommentCtrl
      */
 
-    static async deleteOneComment(req, res) {
+    static async editOneComment(req, res, next) {
+        try {
+            const {commentId, comment} = req.body;
+
+            const result = await pool.query("UPDATE comments SET comment=$1 WHERE comment_Id=$2 RETURNING *", [ comment, commentId]);
+            if (result.rowCount > 0) {
+                res.status(200).json({
+                    status: "status",
+                    message: "Comment successfully edited",
+                    data:{
+                        result: result.rows
+                    }
+                });
+            }else{
+                res.status(404).json({
+                    status: "error",
+                    message: "Comment could not be edited"
+                });
+            }
+        } catch (error) {
+            res.status(500).json({
+                status: "error",
+                message: "Something went wrong"
+            });
+        }
+        next();
+    }
+
+    /**
+     * @static
+     * @params {Object} req
+     * @params {Object} res
+     * @returns Appropriate JSON Response with Status and Data
+     * @memberof CommentCtrl
+     */
+
+    static async deleteOneComment(req, res, next) {
         try {
             const {commentId} = req.params;
 
-            const result = pool.query("DELETE comments WHERE comment_id=$1", [commentId]);
-            if ((await result).rowCount > 0) {
+            const result = await pool.query("DELETE comments WHERE comment_id=$1", [commentId]);
+            if (result.rowCount > 0) {
                 res.status(200).json({
                     status: "status",
                     message: "Comment successfully deleted"
@@ -130,17 +207,16 @@ class CommentCtrl {
                 res.status(404).json({
                     status: "error",
                     message: "Comment could not be deleted"
-                })
+                });
             }
         } catch (error) {
             res.status(500).json({
                 status: "error",
                 message: "Something went wrong"
-            })
+            });
         }
+        next();
     }
 }
-
-
 
 module.exports = CommentCtrl

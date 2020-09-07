@@ -1,42 +1,98 @@
-const nodeCache = require("node-cache");
-const cache = new nodeCache({stdTTL: 5 * 60});
+// const nodeCache = require("node-cache");
+// const cache = new nodeCache({stdTTL: 5 * 60});
 
-class Cache{
+// class Cache{
+//     // var self = this;
+//     getUrlFromRequest(req) {
+//         const url = `${req.protocol  }://${  req.headers.host  }${req.originalUrl}`;
+//         console.log(url)
+//         return url;
+//     }
 
-   static getUrlFromRequest(req) {
-        const url = `${req.protocol  }://${  req.headers.host  }${req.originalUrl}`;
-        return url;
-    }
+//     static setCache(req, res, next) {
+//         const url = self.getUrlFromRequest(req);
+//         cache.set(url, res.locals.data);
+//         return next();
+//     }
 
-    static setCache(req, res, next) {
-        const url = getUrlFromRequest(req);
-        cache.set(url, res.locals.data);
-        return next();
-    }
+//     static let getCache = () => {
+//         const url = this.getUrlFromRequest(req);
+//         const content = cache.get(url);
+//         if (content) {
+//           return res.status(200).send(content);
+//         }
+//         return next();
+//       }
 
-    static getCache(req, res, next) {
-        const url = getUrlFromRequest(req);
-        const content = cache.get(url);
-        if (content) {
-          return res.status(200).send(content);
-        }
-        return next();
-      }
 
-    static clearCache(req, res, next) {
-        cache.keys(function(err, keys) {
-            if (!err) {
-                // again, it depends on your application architecture,
-                // how you would retrive and clear the cache that needs to be cleared.
-                // You may use query path, query params or anything. 
-                let resourceUrl = req.baseUrl;
-                const resourceKeys = keys.filter(k => k.includes(resourceUrl));
+//     static getCache(req, res, next) {
+//         console.log(self)
+//         const url = self.getUrlFromRequest(req);
+//         const content = cache.get(url);
+//         if (content) {
+//           return res.status(200).send(content);
+//         }
+//         return next();
+//       }
+
+//     static clearCache(req, res, next) {
+//         cache.keys(function(err, keys) {
+//             if (!err) {
+//                 // again, it depends on your application architecture,
+//                 // how you would retrive and clear the cache that needs to be cleared.
+//                 // You may use query path, query params or anything. 
+//                 let resourceUrl = req.baseUrl;
+//                 const resourceKeys = keys.filter(k => k.includes(resourceUrl));
       
-                cache.del(resourceKeys);
-            }
-        });
-        return next();
-    }
+//                 cache.del(resourceKeys);
+//             }
+//         });
+//         return next();
+//     }
+// }
+
+// module.exports = Cache;
+
+const NodeCache = require('node-cache');
+
+// stdTTL: time to live in seconds for every generated cache element.
+const cache = new NodeCache({ stdTTL: 5 * 60 });
+
+function getUrlFromRequest(req) {
+  const url = `${req.protocol  }://${  req.headers.host  }${req.originalUrl}`;
+  return url;
 }
 
-module.exports = Cache;
+function setCache(req, res, next) {
+  const url = getUrlFromRequest(req);
+//   cache.set(url, res.locals.data);
+  cache.set(url, res.locals);
+  return next();
+}
+
+function getCache(req, res, next) {
+  const url = getUrlFromRequest(req);
+  const content = cache.get(url);
+  if (content) {
+    return res.status(200).send(content);
+  }
+  return next();
+}
+
+function clearCache(req, res, next) {
+  cache.keys(function(err, keys) {
+      if (!err) {
+          // again, it depends on your application architecture,
+          // how you would retrive and clear the cache that needs to be cleared.
+          // You may use query path, query params or anything. 
+        //   let resourceUrl = req.baseUrl;
+          let resourceUrl = getUrlFromRequest(req);
+          const resourceKeys = keys.filter(k => k.includes(resourceUrl));
+
+          cache.del(resourceKeys);
+      }
+  });
+  return next();
+}
+
+module.exports = { getCache, setCache, clearCache };

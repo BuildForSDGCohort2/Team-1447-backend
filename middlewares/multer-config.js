@@ -9,14 +9,14 @@ const MIMES_TYPE = {
 let name = "devstory"
 const storage = multer.diskStorage({
     // Set file destination
-    destination: (req, file,callback) => {
+    destination: (req, file, callback) => {
     callback(null, "IMAGES");
     },
-    filename: (req,file, callback) => {
+    filename: (req, file, callback) => {
         const extension = MIMES_TYPE[file.mimetype];
         req.extension = extension;
         const newName = name + Date.now() + "-" + file.originalname;
-        callback(null,newName );
+        callback(null, newName);
     }
 });
 

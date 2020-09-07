@@ -1,10 +1,11 @@
 const router = require("express").Router();
 const multer = require('../../middlewares/multer-config');
-const Cache = require("../../middlewares/cache");
+const Auth = require("../../middlewares/auth")
+const {getCache, setCache, clearCache} = require("../../middlewares/cache");
 const MediaCtrl = require("../controllers/mediaCtrl");
 
-router.post("/media/upload", multer.single("image"), MediaCtrl.createMedia, Cache.clearCache);
-router.get("/media/:mediaId", Cache.getCache, MediaCtrl.getOneGif, Cache.setCache);
-router.delete("/media/:mediaId", MediaCtrl.deleteOneMedia, Cache.clearCache);
+router.post("/media/upload", Auth.verifyUser, multer.single("image"), MediaCtrl.createMedia, clearCache);
+router.get("/media/:mediaId", Auth.verifyUser, getCache, MediaCtrl.getOneGif, setCache);
+router.delete("/media/:mediaId", Auth.verifyUser, MediaCtrl.deleteOneMedia, clearCache);
 
 module.exports = router;

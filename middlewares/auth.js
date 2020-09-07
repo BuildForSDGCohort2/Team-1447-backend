@@ -14,13 +14,13 @@ class Auth{
         // console.log(token);
         if (!token || token === undefined) {
           return res.status(403).json({
-            status: 403,
-            error: "You are not Authorize"
+            status: "error",
+            message: "You are not Authorize"
           });
         }
         jwt.verify(token, process.env.TOKEN_SECRET, (error, decode) => {
           if (error) {
-            return res.status(500).json({ status: 500, error: "Expired Authorization ", error});
+            return res.status(500).json({ status: 500, error: "Expired Authorization ",});
           }
           req.user = decode.user_name;
           req.admin = decode.is_admin;

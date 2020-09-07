@@ -1,40 +1,17 @@
-const app = require("../src/app")
+const app = require("../app");
 const request = require("supertest");
-const fs = require("fs");
 require("dotenv").config();
 
 describe("Article ctrl", () => {
-    describe( "get all article with correct Token", () => {
-        test( "author should be able to view all article written", async () => {
-
-        const res = await request(app)
-        .get("/api/v1/articles")
-        .set("content-type", "application/json")
-        .set("authorization", process.env.TOKEN)
-        expect(res.statusCode).toBe(200);
-        });
-    });
-
-    describe( "get all article with Incorrect Token", () => {
-
-        test( "author should be able to view all article written", async () => {
-
-        const res = await request(app)
-        .get("/api/v1/articles")
-        .set("content-type", "application/json")
-        .set("authorization", process.env.FK_TOKEN)
-        expect(res.statusCode).not.toBe(200);
-        });
-    });
 
     describe( "post an article with correct Token", () => {
         // this article controller should deal with handling of image
         const article= {
-            articleTitle: "This is Africa",
+            articleTitle: "USER ID 51",
             articleBody: "This why tech should be in Africa",
             dateOfPub: "2017-04-03",
-            authorId: 25
-        };
+            authorId: 51
+        }
 
         test( "author should be able to post an article",  async () => {
             const res = await request(app)
@@ -67,10 +44,46 @@ describe("Article ctrl", () => {
         });
     });
 
+    describe( "get all article with correct Token", () => {
+        test( "author should be able to view all article written", async () => {
+
+        const res = await request(app)
+        .get("/api/v1/articles")
+        .set("content-type", "application/json")
+        .set("authorization", process.env.TOKEN)
+        expect(res.statusCode).toBe(200);
+        });
+    });
+
+    describe( "get all article with Incorrect Token", () => {
+
+        test( "author should be able to view all article written", async () => {
+            const res = await request(app)
+            .get("/api/v1/feed")
+            .set("Accept", "application/json")
+            .set("content-type", "application/json")
+            .set("authorization", process.env.FK_TOKEN)
+            expect(res.statusCode).not.toBe(200);
+        });
+    });
+
     describe( "get a specific article with correct Token" , () => {
+        let articleId;
+        beforeEach(() => {
+            const articleTitle = "It is so amazing";
+            const articleBody = "This is so amazing, i can't explain why";
+            const dateOfPub = "2020-030-01";
+            const postedBy = 35;
+
+            const query = "INSERT INTO article(article_header, article_body, date_of_pub, posted_by) VALUES($1, $2, $3, $4)";
+            const values = [articleTitle, articleBody, dateOfPub, postedBy];
+            const result = pool.query( query, values);
+            articleId = result.rows[0].article_id;
+        });
+
         test( "GET /articles/:articleId" , async () => {
             const res = await request(app)
-            .get("/api/v1/articles/46")
+            .get(`/api/v1/articles/${articleId}`)
             .set("content-type", "application/json")
             .set("authorization", process.env.TOKEN)
             expect(res.statusCode).toBe(200)
@@ -78,9 +91,21 @@ describe("Article ctrl", () => {
     });
 
     describe( "get a specific article with an Incorrect Token" ,() => {
+        let articleId;
+        beforeEach(() => {
+            const articleTitle = "It is so amazing";
+            const articleBody = "This is so amazing, i can't explain why";
+            const dateOfPub = "2020-030-01";
+            const postedBy = 35;
+
+            const query = "INSERT INTO article(article_header, article_body, date_of_pub, posted_by) VALUES($1, $2, $3, $4)";
+            const values = [articleTitle, articleBody, dateOfPub, postedBy];
+            const result = pool.query(query, values);
+            articleId = result.rows[0].article_id;
+        });
         test( "POST /articles/:articleId", async () => {
             const res = await request(app)
-            .get("/api/v1/articles/45")
+            .get(`/api/v1/articles/${articleId}`)
             .set("content-type", "application/json")
             .set("authorization", process.env.FK_TOKEN)
             expect(res.statusCode).not.toBe(200)
@@ -98,10 +123,10 @@ describe("Article ctrl", () => {
             }
 
             const res = await request(app)
-            .patch("/api/v1/article/edit/48")
+            .patch("/api/v1/article/edit/60")
             .set("content-type", "application/json")
             .set("authorization", process.env.TOKEN)
-            .send(article)
+            .send(article);
             expect(res.statusCode).toBe(201)
         });
     });
@@ -117,18 +142,31 @@ describe("Article ctrl", () => {
             };
 
             const res = await request(app)
-            .patch("/api/v1/article/edit/43")
+            .patch("/api/v1/article/edit/60")
             .set("content-type", "application/json")
             .set("authorization", process.env.FK_TOKEN)
-            .send(article)
+            .send(article);
             expect(res.statusCode).not.toBe(201)
         });
     });
 
     describe( "delete a specific article and media associated to the author with correct Token", () => {
+        let articleId;
+        beforeEach(() => {
+            const articleTitle = "It is so amazing";
+            const articleBody = "This is so amazing, i can't explain why";
+            const dateOfPub = "2020-030-01";
+            const postedBy = 45;
+
+            const query = "INSERT INTO article(article_header, article_body, date_of_pub, posted_by) VALUES($1, $2, $3, $4)";
+            const values = [articleTitle, articleBody, dateOfPub, postedBy];
+            const result = pool.query(query, values);
+            articleId = result.rows[0].article_id;
+        });
+
         test( "DELETE /articles/delete/:articleId", async () => {
             const res = await request(app)
-            .delete("/api/v1/articles/delete/42")
+            .delete(`/api/v1/articles/delete/${articleId}`)
             .set("content-type", "application/json")
             .set("authorization", process.env.TOKEN)
             expect(res.statusCode).toBe(200);
@@ -136,6 +174,20 @@ describe("Article ctrl", () => {
     });
 
     describe( "delete an article and media associated to the author with Incorrect Token" , () => {
+
+        let articleId;
+        beforeEach(() => {
+            const articleTitle = "It is so amazing";
+            const articleBody = "This is so amazing, i can't explain why";
+            const dateOfPub = "2020-030-01";
+            const postedBy = 45;
+
+            const query = "INSERT INTO article(article_header, article_body, date_of_pub, posted_by) VALUES($1, $2, $3, $4)";
+            const values = [articleTitle, articleBody, dateOfPub, postedBy];
+            const result = pool.query(query, values);
+            articleId = result.rows[0].article_id;
+        });
+
         test("DELETE /api/v1/delete/articles/:articleId", async () => {
             const res = await request(app)
             .delete("/api/v1/articles/delete/42")
