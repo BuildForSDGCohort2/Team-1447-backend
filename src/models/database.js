@@ -1,22 +1,10 @@
-const {Pool} = require('pg');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const {Pool} = require("pg");
 
-let connectionString;
-
-const environmentVariable = process.env.NODE_ENV;
-if (environmentVariable.includes('test')) {
-  connectionString = process.env.PG_CONNECTION_STRING;
-
-} else {
-  connectionString = process.env.PRODUCTION;
-}
-
+const isProduction = process.env.NODE_ENV === "production";
+//connection config for production
 const pool = new Pool({
-    connectionString
+    connectionString: isProduction ? process.env.DATABASE_URL : process.env.HEROKU_POSTGRESQL_GREEN_URL,
+    ssl: true
 });
-
-pool.on('connect',() => console.log('working'));
 
 module.exports = pool;

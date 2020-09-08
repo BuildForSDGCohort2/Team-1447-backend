@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS
         phone_number VARCHAR(128) NOT NULL,
         gender VARCHAR(128) NOT NULL,
         is_admin BOOLEAN NOT NULL,
-        avatar_url URL NOT null,
-        UNIQUE(user_name, email, phone_number,user_id),
+        avatar_url TEXT NOT null,
+        UNIQUE(user_name, email, phone_number, user_id),
         PRIMARY KEY(user_id)
     );
 
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS
         article_body TEXT NOT NULL,
         article_posted_by INT NOT NULL,
         article_date_of_pub TIMESTAMP NOT NULL,
-        FOREIGN KEY (posted_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (article_posted_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
     );
 
 CREATE TABLE IF NOT EXISTS
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS
         comment_posted_by INT NOT NULL,
         comment_date_of_pub DATE NOT NULL,
         FOREIGN KEY (article_posted_on) REFERENCES article(article_id) ON DELETE CASCADE ON UPDATE CASCADE,
-        FOREIGN KEY (posted_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (comment_posted_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY (media_posted_on) REFERENCES media(media_id) ON DELETE CASCADE ON UPDATE CASCADE
     );
 
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS
         media_url TEXT,
         date_of_pub DATE NOT NULL,
         media_posted_by INT NOT NULL,
-        FOREIGN KEY (posted_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+        FOREIGN KEY (media_posted_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
     );
 
      -- FOREIGN KEY (posted_on) REFERENCES article(article_id) ON DELETE CASCADE ON UPDATE CASCADE,

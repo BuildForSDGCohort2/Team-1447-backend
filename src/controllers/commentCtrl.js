@@ -13,7 +13,7 @@ class CommentCtrl {
     static async createComment(req, res, next) {
         try {
             const { comment, articlePostedOn, postedBy, dateOfPub, mediaPostedOn } = req.body;
-            const query = "INSERT INTO comments(comment, article_posted_on, posted_by, date_of_pub, media_posted_on) VALUES($1, $2, $3, $4, $5) RETURNING *";
+            const query = "INSERT INTO comments(comment, article_posted_on, comment_posted_by, comment_date_of_pub, media_posted_on) VALUES($1, $2, $3, $4, $5) RETURNING *";
             const values = [ comment, articlePostedOn, postedBy, dateOfPub, mediaPostedOn ];
             const result = await pool.query(query, values);
             if (result.rowCount > 0) {
@@ -52,7 +52,7 @@ class CommentCtrl {
 
         try {
             const {mediaId} = req.params;
-            const result = await pool.query("SELECT * FROM comments WHERE media_posted_on=$1", [mediaId]);
+            const result = await pool.query("SELECT * FROM comments WHERE media_posted_on=$1 ORDER BY media_date_of_pub DESC", [mediaId]);
             console.log(result.rows);
             if (result.rowCount > 0) {
                 res.status(200).json({
@@ -110,7 +110,7 @@ class CommentCtrl {
                 error
             });
         }
-         next();
+        next();
     }
 
 

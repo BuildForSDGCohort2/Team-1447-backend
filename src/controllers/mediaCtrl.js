@@ -45,8 +45,8 @@ class MediaCtrl{
 
     
                 const query = 
-                    `INSERT INTO media(media_ext, media_url, media_type, date_of_pub, media_caption, posted_by) 
-                    VALUES( $1, $2, $3, $4, $5, $6 ) RETURNING media_id, media_url, media_caption, posted_by, date_of_pub`;
+                    `INSERT INTO media(media_ext, media_url, media_type, media_date_of_pub, media_caption, media_posted_by) 
+                    VALUES( $1, $2, $3, $4, $5, $6 ) RETURNING media_id, media_url, media_caption, media_posted_by, media_date_of_pub`;
                 const values = [ext, mediaUrl, mediaType, postedOn , mediaCaption, id];
 
                 const result = await pool.query(query, values);

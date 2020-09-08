@@ -36,4 +36,4 @@ module.exports = multer({
     // limits is 8 MB in size
     limits: {fileSize: 8 * (1024 * 1024)},
     fileFilter
-})
+});

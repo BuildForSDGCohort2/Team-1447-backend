@@ -60,12 +60,12 @@ describe( "MediaCtrl", () => {
         let mediaId;
         beforeEach( async () => {
             const ext = "image";
-            const mediaUrl = "https://cloudinary.com/folder/picture.jpg";
+            const mediaUrl = "./test-images/pup.jpg";
             const mediaType = "png";
             const postedOn = "2003-04-04";
             const postedBy = 25;
             const mediaCaption = "Waka don flocka";
-            const query = `INSERT INTO media(media_ext, media_url, media_type, date_of_pub, media_caption, posted_by) 
+            const query = `INSERT INTO media(media_ext, media_url, media_type, media_date_of_pub, media_caption, media_posted_by) 
                            VALUES( $1, $2, $3, $4, $5, $6 ) RETURNING media_id`;
             const values = [ext, mediaUrl, mediaType, postedOn , mediaCaption, postedBy];
             const result = await pool.query(query, values);
@@ -87,12 +87,12 @@ describe( "MediaCtrl", () => {
         beforeEach( async () => {
 
             const ext = "image";
-            const mediaUrl = "https://cloudinary.com/folder/picture.jpg";
+            const mediaUrl = "./test-images/pup.jpg";
             const mediaType = "png";
             const postedOn = "2003-04-04";
             const postedBy = 25;
             const mediaCaption = "Waka don flocka";
-            const query = `INSERT INTO media(media_ext, media_url, media_type, date_of_pub, media_caption, posted_by) 
+            const query = `INSERT INTO media(media_ext, media_url, media_type, media_date_of_pub, media_caption, media_posted_by) 
                             VALUES( $1, $2, $3, $4, $5, $6 ) RETURNING media_id`;
             const values = [ext, mediaUrl, mediaType, postedOn , mediaCaption, postedBy];
             const result = await pool.query(query, values);

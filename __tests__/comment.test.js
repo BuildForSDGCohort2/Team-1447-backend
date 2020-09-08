@@ -8,18 +8,18 @@ describe( "commentCtrl", () => {
         test( "POST/comment", async () => {
             const comments = {
                 comment: "This is the most senseless post i have read",
-                postedBy: 25,
-                articlePostedOn: 111,
+                postedBy: 1,
+                articlePostedOn: 1,
                 dateOfPub: "2003-05-03"
             }
             
             const res = await request(app)
-            .post("/api/v1/comment")
+            .post("https://www.apidevstory.herokuapp.com/api/v1/comment")
             .set("Accept", "application/json")
             .set("Authorization", process.env.TOKEN)
             .send(comments);
-            expect(res.statusCode).toBe(201)
-            expect(res.headers["content-type"]).toBe("application/json; charset=utf-8")
+            expect(res.statusCode).toBe(201);
+            expect(res.headers["content-type"]).toBe("application/json; charset=utf-8");
         });
     });
 
@@ -27,13 +27,13 @@ describe( "commentCtrl", () => {
         test( "POST/comment", async () => {
             const comments = {
                 comment: "This is the most senseless post i have read",
-                postedBy: 25,
-                articlePostedOn: 111,
+                postedBy: 1,
+                articlePostedOn: 1,
                 dateOfPub: "2003-05-03"
             }
             
             const res = await request(app)
-            .post("/api/v1/comment")
+            .post("https://www.apidevstory.herokuapp.com/api/v1/comment")
             .set("Accept", "application/json")
             .set("Authorization", process.env.FK_TOKEN)
             .send(comments);
@@ -46,7 +46,7 @@ describe( "commentCtrl", () => {
         test( "GET/comments", async () => {
             
             const res = await request(app)
-            .get("/api/v1/111/comments")
+            .get("https://www.apidevstory.herokuapp.com/api/v1/1/comments")
             .set("Accept", "application/json")
             .set("Authorization", process.env.TOKEN);
             expect(res.statusCode).toBe(200);
@@ -58,7 +58,7 @@ describe( "commentCtrl", () => {
         test( "GET/comments", async () => {
             
             const res = await request(app)
-            .get("/api/v1/111/comments")
+            .get("https://www.apidevstory.herokuapp.com/api/v1/1/comments")
             .set("Accept", "application/json")
             .set("Authorization", process.env.FK_TOKEN);
             expect(res.statusCode).not.toBe(200);
@@ -67,10 +67,22 @@ describe( "commentCtrl", () => {
     });
 
     describe( "Get all comment with Media ID  and Valid Token",  () => {
+        let mediaId;
+        beforeEach(() => {
+            const res = await request(app)
+            .post("/api/v1/media/upload")
+            .set("Accept", "multipart/form-data")
+            .set("authorization", process.env.TOKEN)
+            .field("postedOn", "2008-04-03")
+            .field("mediaCaption", "LOREM")
+            .attach("image", "./test-images/dog.jpg");
+            mediaId = res.rows[0].media_id;
+        });
+        
         test( "GET/comments", async () => {
             
             const res = await request(app)
-            .get("/api/v1/37/comments")
+            .get(`https://www.apidevstory.herokuapp.com/api/v1/${mediaId}/comments`)
             .set("Accept", "application/json")
             .set("Authorization", process.env.TOKEN);
             expect(res.statusCode).toBe(200);
@@ -79,10 +91,22 @@ describe( "commentCtrl", () => {
     });
 
     describe( "Get all comment with Media ID Invalid Token",  () => {
+        let mediaId;
+        beforeEach(() => {
+            const res = await request(app)
+            .post("/api/v1/media/upload")
+            .set("Accept", "multipart/form-data")
+            .set("authorization", process.env.FK_TOKEN)
+            .field("postedOn", "2008-04-03")
+            .field("mediaCaption", "LOREM")
+            .attach("image", "./test-images/dog.jpg");
+            mediaId = res.rows[0].media_id;
+        });
+
         test( "GET/comments", async () => {
             
             const res = await request(app)
-            .get("/api/v1/37/comments")
+            .get(`https://www.apidevstory.herokuapp.com/api/v1/${mediaId}/comments`)
             .set("Accept", "application/json")
             .set("Authorization", process.env.FK_TOKEN);
             expect(res.statusCode).not.toBe(200);
@@ -96,11 +120,11 @@ describe( "commentCtrl", () => {
         beforeEach( async () => {
            
             const comment = "This is the most senseless post i have read"
-            const postedBy = 37;
+            const postedBy = 1;
             const articlePostedOn = 80;
             const postedOn = "2003-05-03";
             
-            const query = `INSERT INTO comments(comment, article_posted_on, posted_by, date_of_pub) VALUES($1, $2, $3, $4) RETURNING comment_id, article_posted_on`;
+            const query = `INSERT INTO comments(comment, article_posted_on, comment_posted_by, comment_date_of_pub) VALUES($1, $2, $3, $4) RETURNING comment_id, article_posted_on`;
             const values = [comment, articlePostedOn, postedBy, postedOn];
             const result = await pool.query(query, values);
             commentId = result.rows[0].comment_id;
@@ -111,7 +135,7 @@ describe( "commentCtrl", () => {
           
             
             const res = await request(app)
-            .get(`/api/v1/${articleId}/comments/${commentId}`)
+            .get(`https://www.apidevstory.herokuapp.com/api/v1/${articleId}/comments/${commentId}`)
             .set("Accept", "application/json")
             .set("Authorization", process.env.TOKEN);
             expect(res.statusCode).toBe(200);
@@ -124,11 +148,11 @@ describe( "commentCtrl", () => {
         beforeEach( async () => {
             
             const  comment = "This is the most senseless post i have read";
-            const  postedBy = 37;
-            const  articlePostedOn = 80;
+            const  postedBy = 1;
+            const  articlePostedOn = 1;
             const  dateOfPub = "2003-05-03";
           
-            const query = `INSERT INTO comments(comment, article_posted_on, posted_by, date_of_pub) VALUES($1, $2, $3, $4) RETURNING comment_id, article_posted_on`;
+            const query = `INSERT INTO comments(comment, article_posted_on, comment_posted_by, comment_date_of_pub) VALUES($1, $2, $3, $4) RETURNING comment_id, article_posted_on`;
             const values = [comment, articlePostedOn, postedBy, dateOfPub];
 
             const result = await pool.query(query, values);
@@ -139,7 +163,7 @@ describe( "commentCtrl", () => {
         test( "GET/:articleId/comments/:commentId", async () => {
             
             const res = await request(app)
-            .get(`/api/v1/${articleId}/comments/${commentId}`)
+            .get(`https://www.apidevstory.herokuapp.com/api/v1/${articleId}/comments/${commentId}`)
             .set("Accept", "application/json")
             .set("Authorization", process.env.FK_TOKEN);
             expect(res.statusCode).not.toBe(200);
@@ -153,11 +177,11 @@ describe( "commentCtrl", () => {
         beforeEach( async () => {
         
             const comment = "This is the most senseless post i have read";
-            const postedBy = 37;
-            const articlePostedOn = 117;  
+            const postedBy = 1;
+            const articlePostedOn = 1;  
             const dateOfPub = "2003-05-03";
          
-            const query = `INSERT INTO comments(comment, article_posted_on, posted_by, date_of_pub) VALUES($1, $2, $3, $4) RETURNING comment_id, article_posted_on`;
+            const query = `INSERT INTO comments(comment, article_posted_on, comment_posted_by, comment_date_of_pub) VALUES($1, $2, $3, $4) RETURNING comment_id, article_posted_on`;
             const values = [comment, articlePostedOn, postedBy, dateOfPub];
 
             const result = await pool.query(query, values);
@@ -168,7 +192,7 @@ describe( "commentCtrl", () => {
         test( "DELETE/:articleId/comments/:commentId", async () => {
             
             const res = await request(app)
-            .delete(`/api/v1/${articleId}/comments/${commentId}`)
+            .delete(`https://www.apidevstory.herokuapp.com/api/v1/${articleId}/comments/${commentId}`)
             .set("Accept", "application/json")
             .set("Authorization", process.env.FK_TOKEN);
             expect(res.statusCode).not.toBe(200);
@@ -180,12 +204,12 @@ describe( "commentCtrl", () => {
         let articleId, commentId;
         beforeEach( async () => {
           
-               const comment = "This is the most senseless post i have read";
-               const postedBy = 37;
-               const articlePostedOn = 85;
-               const dateOfPub = "2003-05-03";
+            const comment = "This is the most senseless post i have read";
+            const postedBy = 1;
+            const articlePostedOn = 1;
+            const dateOfPub = "2003-05-03";
         
-            const query = `INSERT INTO comments(comment, article_posted_on, posted_by, date_of_pub) VALUES($1, $2, $3, $4) RETURNING comment_id, article_posted_on`;
+            const query = `INSERT INTO comments(comment, article_posted_on, comment_posted_by, comment_date_of_pub) VALUES($1, $2, $3, $4) RETURNING comment_id, article_posted_on`;
             const values = [comment, articlePostedOn, postedBy, dateOfPub];
 
             const result = await pool.query(query, values);
@@ -195,7 +219,7 @@ describe( "commentCtrl", () => {
         test( "DELETE/:articleId/comments/:commentId", async () => {
             
             const res = await request(app)
-            .delete(`/api/v1/${articleId}/comments/${commentId}`)
+            .delete(`https://www.apidevstory.herokuapp.com/api/v1/${articleId}/comments/${commentId}`)
             .set("Accept", "application/json")
             .set("Authorization", process.env.FK_TOKEN);
             expect(res.statusCode).not.toBe(200);

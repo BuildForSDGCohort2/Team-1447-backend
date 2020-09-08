@@ -10,16 +10,16 @@ describe("Article ctrl", () => {
             articleTitle: "USER ID 51",
             articleBody: "This why tech should be in Africa",
             dateOfPub: "2017-04-03",
-            authorId: 51
+            authorId: 1
         }
 
         test( "author should be able to post an article",  async () => {
             const res = await request(app)
-            .post("/api/v1/create/article")
+            .post("https://www.apidevstory.herokuapp.com/api/v1/create/article")
             .set("content-type", "application/json")
             .set("authorization", process.env.TOKEN)
-            .send(article)
-            expect(res.statusCode).toBe(201)
+            .send(article);
+            expect(res.statusCode).toBe(201);
             // expect(res.body.status).haveProperty("status");
         });
     });
@@ -30,16 +30,16 @@ describe("Article ctrl", () => {
             articleTitle: "This is Africa",
             articleBody: "This why tech should be in Africa",
             dateOfPub: "2017-04-03",
-            authorId: 25
+            authorId: 1
         }
 
         test( "POST /article",  async () => {
             const res = await request(app)
-            .post("/api/v1/create/article")
+            .post("https://www.apidevstory.herokuapp.com/api/v1/create/article")
             .set("content-type", "application/json")
             .set("authorization", process.env.FK_TOKEN)
-            .send(article)
-            expect(res.statusCode).not.toBe(201)
+            .send(article);
+            expect(res.statusCode).not.toBe(201);
             // expect(res.body.status).haveProperty("status");
         });
     });
@@ -48,9 +48,9 @@ describe("Article ctrl", () => {
         test( "author should be able to view all article written", async () => {
 
         const res = await request(app)
-        .get("/api/v1/articles")
+        .get("https://www.apidevstory.herokuapp.com/api/v1/articles")
         .set("content-type", "application/json")
-        .set("authorization", process.env.TOKEN)
+        .set("authorization", process.env.TOKEN);
         expect(res.statusCode).toBe(200);
         });
     });
@@ -59,10 +59,10 @@ describe("Article ctrl", () => {
 
         test( "author should be able to view all article written", async () => {
             const res = await request(app)
-            .get("/api/v1/feed")
+            .get("https://www.apidevstory.herokuapp.com/api/v1/feed")
             .set("Accept", "application/json")
             .set("content-type", "application/json")
-            .set("authorization", process.env.FK_TOKEN)
+            .set("authorization", process.env.FK_TOKEN);
             expect(res.statusCode).not.toBe(200);
         });
     });
@@ -73,9 +73,9 @@ describe("Article ctrl", () => {
             const articleTitle = "It is so amazing";
             const articleBody = "This is so amazing, i can't explain why";
             const dateOfPub = "2020-030-01";
-            const postedBy = 35;
+            const postedBy = 1;
 
-            const query = "INSERT INTO article(article_header, article_body, date_of_pub, posted_by) VALUES($1, $2, $3, $4)";
+            const query = "INSERT INTO article(article_header, article_body, article_date_of_pub, article_posted_by) VALUES($1, $2, $3, $4)";
             const values = [articleTitle, articleBody, dateOfPub, postedBy];
             const result = pool.query( query, values);
             articleId = result.rows[0].article_id;
@@ -83,10 +83,10 @@ describe("Article ctrl", () => {
 
         test( "GET /articles/:articleId" , async () => {
             const res = await request(app)
-            .get(`/api/v1/articles/${articleId}`)
+            .get(`https://www.apidevstory.herokuapp.com/api/v1/articles/${articleId}`)
             .set("content-type", "application/json")
-            .set("authorization", process.env.TOKEN)
-            expect(res.statusCode).toBe(200)
+            .set("authorization", process.env.TOKEN);
+            expect(res.statusCode).toBe(200);
         });
     });
 
@@ -96,23 +96,37 @@ describe("Article ctrl", () => {
             const articleTitle = "It is so amazing";
             const articleBody = "This is so amazing, i can't explain why";
             const dateOfPub = "2020-030-01";
-            const postedBy = 35;
+            const postedBy = 1;
 
-            const query = "INSERT INTO article(article_header, article_body, date_of_pub, posted_by) VALUES($1, $2, $3, $4)";
+            const query = "INSERT INTO article(article_header, article_body, article_date_of_pub, article_posted_by) VALUES($1, $2, $3, $4)";
             const values = [articleTitle, articleBody, dateOfPub, postedBy];
             const result = pool.query(query, values);
             articleId = result.rows[0].article_id;
         });
         test( "POST /articles/:articleId", async () => {
             const res = await request(app)
-            .get(`/api/v1/articles/${articleId}`)
+            .get(`https://www.apidevstory.herokuapp.com/api/v1/articles/${articleId}`)
             .set("content-type", "application/json")
-            .set("authorization", process.env.FK_TOKEN)
-            expect(res.statusCode).not.toBe(200)
+            .set("authorization", process.env.FK_TOKEN);
+            expect(res.statusCode).not.toBe(200);
         });
     });
 
     describe("edit a specific article with correct Token", () => {
+        
+        let articleId;
+        beforeEach(() => {
+            const articleTitle = "It is so amazing";
+            const articleBody = "This is so amazing, i can't explain why";
+            const dateOfPub = "2020-030-01";
+            const postedBy = 1;
+
+            const query = "INSERT INTO article(article_header, article_body, article_date_of_pub, article_posted_by) VALUES($1, $2, $3, $4)";
+            const values = [articleTitle, articleBody, dateOfPub, postedBy];
+            const result = pool.query(query, values);
+            articleId = result.rows[0].article_id;
+        });
+
         test("PATCH /article/edit/:articleId", async () => {
 
             const article = {
@@ -123,15 +137,29 @@ describe("Article ctrl", () => {
             }
 
             const res = await request(app)
-            .patch("/api/v1/article/edit/60")
+            .patch(`https://www.apidevstory.herokuapp.com/api/v1/article/edit/${articleId}`)
             .set("content-type", "application/json")
             .set("authorization", process.env.TOKEN)
             .send(article);
-            expect(res.statusCode).toBe(201)
+            expect(res.statusCode).toBe(201);
         });
     });
 
     describe( "edit a specific article with Incorrect Token", () => {
+
+        let articleId;
+        beforeEach(() => {
+            const articleTitle = "It is so amazing";
+            const articleBody = "This is so amazing, i can't explain why";
+            const dateOfPub = "2020-030-01";
+            const postedBy = 1;
+
+            const query = "INSERT INTO article(article_header, article_body, article_date_of_pub, article_posted_by) VALUES($1, $2, $3, $4)";
+            const values = [articleTitle, articleBody, dateOfPub, postedBy];
+            const result = pool.query(query, values);
+            articleId = result.rows[0].article_id;
+        });
+
         test( "PATCH /article/edit/:articleId", async () => {
 
             const article = {
@@ -142,11 +170,11 @@ describe("Article ctrl", () => {
             };
 
             const res = await request(app)
-            .patch("/api/v1/article/edit/60")
+            .patch(`https://www.apidevstory.herokuapp.com/api/v1/article/edit/${articleId}`)
             .set("content-type", "application/json")
             .set("authorization", process.env.FK_TOKEN)
             .send(article);
-            expect(res.statusCode).not.toBe(201)
+            expect(res.statusCode).not.toBe(201);
         });
     });
 
@@ -158,7 +186,7 @@ describe("Article ctrl", () => {
             const dateOfPub = "2020-030-01";
             const postedBy = 45;
 
-            const query = "INSERT INTO article(article_header, article_body, date_of_pub, posted_by) VALUES($1, $2, $3, $4)";
+            const query = "INSERT INTO article(article_header, article_body, article_date_of_pub, article_posted_by) VALUES($1, $2, $3, $4)";
             const values = [articleTitle, articleBody, dateOfPub, postedBy];
             const result = pool.query(query, values);
             articleId = result.rows[0].article_id;
@@ -166,9 +194,9 @@ describe("Article ctrl", () => {
 
         test( "DELETE /articles/delete/:articleId", async () => {
             const res = await request(app)
-            .delete(`/api/v1/articles/delete/${articleId}`)
+            .delete(`https://www.apidevstory.herokuapp.com/api/v1/articles/delete/${articleId}`)
             .set("content-type", "application/json")
-            .set("authorization", process.env.TOKEN)
+            .set("authorization", process.env.TOKEN);
             expect(res.statusCode).toBe(200);
         });
     });
@@ -182,7 +210,7 @@ describe("Article ctrl", () => {
             const dateOfPub = "2020-030-01";
             const postedBy = 45;
 
-            const query = "INSERT INTO article(article_header, article_body, date_of_pub, posted_by) VALUES($1, $2, $3, $4)";
+            const query = "INSERT INTO article(article_header, article_body, article_date_of_pub, article_posted_by) VALUES($1, $2, $3, $4)";
             const values = [articleTitle, articleBody, dateOfPub, postedBy];
             const result = pool.query(query, values);
             articleId = result.rows[0].article_id;
@@ -190,31 +218,31 @@ describe("Article ctrl", () => {
 
         test("DELETE /api/v1/delete/articles/:articleId", async () => {
             const res = await request(app)
-            .delete("/api/v1/articles/delete/42")
+            .delete(`https://www.apidevstory.herokuapp.com/api/v1/articles/delete/${articleId}`)
             .set("content-type", "application/json")
-            .set("authorization", process.env.FK_TOKEN)
+            .set("authorization", process.env.FK_TOKEN);
             expect(res.statusCode).not.toBe(200);
         });
     });
 
-    describe( "delete all article and media associated to the author with correct Token", () => {
+    // describe( "delete all article and media associated to the author with correct Token", () => {
 
-        test( "DELETE /article/", async () => {
-            const res = await request(app)
-            .delete("/api/v1/delete/articles/")
-            .set("content-type", "application/json")
-            .set("authorization", process.env.TOKEN)
-            expect(res.statusCode).toBe(200);
-        });
-    });
+    //     test( "DELETE /article/", async () => {
+    //         const res = await request(app)
+    //         .delete("/api/v1/delete/articles/")
+    //         .set("content-type", "application/json")
+    //         .set("authorization", process.env.TOKEN);
+    //         expect(res.statusCode).toBe(200);
+    //     });
+    // });
 
-    describe( "delete all article and media associated to the author with Incorrect Token", () => {
-        test( "DELETE /article/", async () => {
-            const res = await request(app)
-            .delete("/api/v1/delete/articles/")
-            .set("content-type", "application/json")
-            .set("authorization", process.env.FK_TOKEN)
-            expect(res.statusCode).not.toBe(200);
-        });
-    });
+    // describe( "delete all article and media associated to the author with Incorrect Token", () => {
+    //     test( "DELETE /article/", async () => {
+    //         const res = await request(app)
+    //         .delete("https://www.apidevstory.herokuapp.com/api/v1/delete/articles/")
+    //         .set("content-type", "application/json")
+    //         .set("authorization", process.env.FK_TOKEN);
+    //         expect(res.statusCode).not.toBe(200);
+    //     });
+    // });
 });

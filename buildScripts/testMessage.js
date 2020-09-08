@@ -1,3 +1,3 @@
-let chalk = require('chalk');
+let chalk = require("chalk");
  
-console.log(chalk.red('Starting app in test mode...'));
+console.log(chalk.red("Starting app in test mode..."));

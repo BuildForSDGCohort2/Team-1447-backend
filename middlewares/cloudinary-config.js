@@ -1,5 +1,5 @@
-const cloudinary = require('cloudinary')
-require('dotenv').config();
+const cloudinary = require("cloudinary");
+require("dotenv").config();
 
 cloudinary.config({
     cloud_name:process.env.CLOUD_NAME,
@@ -9,15 +9,15 @@ cloudinary.config({
 });
 
 exports.uploads = (file, folder) => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         cloudinary.uploader.upload(file, (result) => {
             resolve({
                 url: result.url,
                 id: result.public_id
-            })
+            });
         }, {
             resource_type: "auto",
             folder: folder
-        })
-    })
+        });
+    });
 }

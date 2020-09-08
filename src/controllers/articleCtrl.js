@@ -16,7 +16,7 @@ class Article{
             //! THE DATE OF PUB SHOULD ONE BE SET BY JAVASCRIPT OR POSTGRES
             const {articleTitle, articleBody, dateOfPub, authorId} = req.body;
         
-            const query =  `INSERT INTO article(article_header, article_body, date_of_pub, posted_by) VALUES($1, $2, $3,$4) RETURNING *`
+            const query =  `INSERT INTO article(article_header, article_body, date_of_pub, posted_by) VALUES($1, $2, $3,$4) RETURNING *`;
             
             const values = [articleTitle, articleBody, dateOfPub, authorId];
     
@@ -75,11 +75,11 @@ class Article{
         try {
             //! give each attribute distinct name
             const query = `
-            SELECT article_id , article_header, article.posted_by, article.date_of_pub, comment_id, comment, 
-            comments.date_of_pub, comments.posted_by, article_posted_on, media_id, media_caption,
+            SELECT article_id , article_header, article_posted_by, article_date_of_pub, comment_id, comment, 
+            comments_date_of_pub, comments_posted_by, article_posted_on, media_id, media_caption,
             media_url, user_name, user_id FROM article LEFT JOIN comments ON article_posted_on=article_id 
-            FULL JOIN media ON media_id=media_posted_on LEFT JOIN users ON user_id=comments.posted_by;                   
-            `
+            FULL JOIN media ON media_id=media_posted_on LEFT JOIN users ON user_id=comments_posted_by                   
+            `;
             // const result = await pool.query("SELECT article_header, article_body, date_of_pub, avatar_url FROM article INNER JOIN users ON user_id = posted_by WHERE posted_by=$1", [userId]);  
             // const result = await pool.query("SELECT * FROM article WHERE posted_by=$1 ORDER BY article_id ", [userId]); 
             const result = await pool.query(query);
@@ -135,12 +135,12 @@ class Article{
         try {
             const articleId = Number(req.params.articleId);
 
-            const query = `SELECT article_id, article_header, article_body, article.posted_by, article.date_of_pub, 
-                           comment_id, comment, comments.date_of_pub, comments.posted_by, media_posted_on, 
-                           user_name, user_id FROM article LEFT JOIN comments ON article_id=comments.media_posted_on 
-                           LEFT JOIN users ON comments.posted_by=user_id WHERE article_id=${articleId} ORDER BY article.date_of_pub DESC;`
+            const query = `SELECT article_id, article_header, article_body, article_posted_by, article_date_of_pub, 
+                           comment_id, comment, comments_date_of_pub, comments_posted_by, media_posted_on, 
+                           user_name, user_id FROM article LEFT JOIN comments ON article_id=comments_media_posted_on 
+                           LEFT JOIN users ON comments_posted_by=user_id WHERE article_id=${articleId} ORDER BY article_date_of_pub DESC`;
 
-            const result = await pool.query("SELECT * FROM article WHERE article_id = $1", [articleId]);
+            const result = await pool.query(query);
 
             if (result.rowCount > 0) {
                 // set property for caching
@@ -148,9 +148,9 @@ class Article{
                     status: "success",
                     data: [{
                         id: result.rows[0].article_id,
-                        articleTitle: result.rows[0].article_body,  
+                        articleTitle: result.rows[0].article_header,  
                         article: result.rows[0].article_body,
-                        authorId: result.rows[0].posted_by
+                        authorId: result.rows[0].article_posted_by
                     }]
                 }
                 // response sent back to client
@@ -158,9 +158,9 @@ class Article{
                     status: "success",
                     data: [{
                         id: result.rows[0].article_id,
-                        articleTitle: result.rows[0].article_body,  
+                        articleTitle: result.rows[0].article_header,  
                         article: result.rows[0].article_body,
-                        authorId: result.rows[0].posted_by
+                        authorId: result.rows[0].article_posted_by
                     }]
                 });
             }else{
@@ -288,7 +288,7 @@ class Article{
              const userId = req.params.userId;
              //! A join to make article and media table delete the assoc data
             // const result = await pool.query("DELETE FROM article INNER JOIN media ON article.posted_by= media.posted_by ");
-            const result = await pool.query("DELETE FROM article WHERE posted_by=$1", [userId]);
+            const result = await pool.query("DELETE FROM article WHERE article_posted_by=$1", [userId]);
             // const result = await pool.query("DELETE FROM media WHERE posted_by=$1", [userId]);
             if(result.rowCount > 0){
                 // seting object for caching

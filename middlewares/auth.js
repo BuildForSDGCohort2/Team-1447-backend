@@ -20,7 +20,7 @@ class Auth{
         }
         jwt.verify(token, process.env.TOKEN_SECRET, (error, decode) => {
           if (error) {
-            return res.status(500).json({ status: 500, error: "Expired Authorization ",});
+            return res.status(500).json({ status: 500, error: "Expired Authorization "});
           }
           req.user = decode.user_name;
           req.admin = decode.is_admin;

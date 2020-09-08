@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const pool = require("../models/database");
 const nodeMailer = require("nodemailer")
-require("dotenv").config();
+
 
 // Sign Up ctrl
 class UserCtrl{
@@ -18,7 +18,7 @@ class UserCtrl{
      // User Sign Up
     static async creatUser(req, res){
         
-        const {firstName, lastName, dateOfBirth,  userEmail ,phonenumber, gender, userName, isAdmin, avatarUrl, password} = req.body;
+        const {firstName, lastName, dateOfBirth, userEmail, phonenumber, gender, userName, isAdmin, avatarUrl, password} = req.body;
         // console.log(userEmail, 1)
         try {
             // Generate the salt
@@ -32,7 +32,7 @@ class UserCtrl{
             if (hash) {
 
                 // Check if the email exists in the database 
-                let resultCheck = await pool.query("SELECT email FROM users WHERE email=$1", [userEmail]);
+                let resultCheck = await pool.query("SELECT email user_name FROM users WHERE email=$1, user_name=$2", [userEmail, userName]);
                 // console.log(userEmail, 2);
                 
                 if (resultCheck.rowCount > 0){
@@ -122,13 +122,13 @@ class UserCtrl{
                     jwt.verify(token, process.env.TOKEN_SECRET, (error, decode) => {
                         if (error) {
                            res.status(500).json({ status: 500, error: "Expired Authorization ", error});
+                        }else {
+                            res.status(200).json({
+                                data: {
+                                    message: "You have logged in successfully"
+                                }
+                            });
                         }
-    
-                        res.status(200).json({
-                            data: {
-                                message: "You have logged in successfully 5"
-                            }
-                        });
                     });
                 }else {
                     jwt.sign({ loginData }, process.env.TOKEN_SECRET, { expiresIn: "365d" }, (err, token) => {
@@ -234,7 +234,7 @@ class UserCtrl{
                     else {
                        // Create a mail transport
                     let transporter = nodeMailer.createTransport({
-                    service: 'smtp.gmail',
+                    service: "smtp.gmail",
                     port: 465,
                     secure: true,
                     auth: {
@@ -245,9 +245,9 @@ class UserCtrl{
 
                   // Mail information for recipient
                   var mailOptions = {
-                    from: 'hakanboysidol@gmail.com',
+                    from: "hakanboysido@gmail.com",
                     to: email,
-                    subject: 'Reset Password Link - Devstory',
+                    subject: "Reset Password Link - Devstory",
                     text: `<p>You requested to reset your password. 
                     Click <a href="https://devstory.netlify.app/Politico/changepassword.html?token=${token}">here</a> to reset it</p><br/>
                     <p>This token will expire in 15 minutes</p><p>Pls, ignore if you are not the one</p>. <p>Contact mail us @ politicoxpress@gmail.com for help</p>`
@@ -258,7 +258,7 @@ class UserCtrl{
                     if (error) {
                       console.log(error);
                     } else {
-                      console.log('Email sent: ' + info.response);
+                      console.log("Email sent: " + info.response);
                     }
                   });
                 }
@@ -358,7 +358,7 @@ class UserCtrl{
                 }
                 res.status(404).json({
                     status: "error",
-                    message: "Account doesn't exists"
+                    message: "Account doesn"t exists"
                 })
             }
         }catch (error) {

@@ -1,35 +1,34 @@
 const app = require("../app");
 const request = require("supertest");
+const shortId = require("shortid");
 require("dotenv").config();
 
-let token;
-
 describe("Userctrl", ()  => {
-
+  const email = `${shortId.generate()}@gmail.com`;
   describe( "User sign up with correct email" ,() => {
 
-    // test( "POST/auth/signup" , async () => {
+    test( "POST/auth/signup" , async () => {
      
-    //   const loginDetails = {
-    //     firstName : "LEONARD", 
-    //     lastName: "KWAHI",
-    //     userEmail: "raptor09s7g7y@testid.com", 
-    //     userName: "kawls", 
-    //     dateOfBirth: "1009-02-04",  
-    //     phonenumber: "0494049", 
-    //     gender: "Female", 
-    //     isAdmin: false, 
-    //     avatarUrl: "jfkdjfk.com", 
-    //     password: "nbachamps"
-    //   }
+      const loginDetails = {
+        firstName : "LEONARD", 
+        lastName: "KWAHI",
+        userEmail: email, 
+        userName: "kawls", 
+        dateOfBirth: "1009-02-04",  
+        phonenumber: "0494049", 
+        gender: "Female", 
+        isAdmin: false, 
+        avatarUrl: "jfkdjfk.com", 
+        password: "nbachamps"
+      }
      
-    //   const res = await request(app)
-    //   .post("/api/v1/auth/signUp")
-    //   .set("content-type", "application/json")
-    //   .send(loginDetails);
-    //   // token = res.body.data.token;
-    //   expect(res.statusCode).toBe(201)
-    // });
+      const res = await request(app)
+      .post("https://www.apidevstory.herokuapp.com/api/v1/auth/signUp")
+      .set("content-type", "application/json")
+      .send(loginDetails);
+      // token = res.body.data.token;
+      expect(res.statusCode).toBe(201);
+    });
 
   });
 
@@ -41,7 +40,7 @@ describe("Userctrl", ()  => {
         firstName : "KWAHI", 
         lastName: "LEONARD", 
         dateOfBirth: "1009-02-04", 
-        userEmail: "we@wein.com", 
+        userEmail: email, 
         phonenumber: "0494049", 
         gender: "Female", 
         userName: "kawls", 
@@ -51,10 +50,10 @@ describe("Userctrl", ()  => {
       };
 
       const res = await request(app)
-      .post("/api/v1/auth/signUp")
+      .post("https://www.apidevstory.herokuapp.com/api/v1/auth/signUp")
       .set("content-type", "application/json")
       .send(loginDetails);
-      expect(res.statusCode).not.toBe(201)
+      expect(res.statusCode).not.toBe(201);
     });
 
   });
@@ -68,7 +67,7 @@ describe("Userctrl", ()  => {
           "password": process.env.PASSWORD
         };
         const res = await request(app)
-        .post("/api/v1/auth/login")
+        .post("https://www.apidevstory.herokuapp.com/api/v1/auth/login")
         .set("content-type", "application/json")
         .set("authorization", process.env.TOKEN)
         .send(loginDetails);
@@ -83,7 +82,7 @@ describe("Userctrl", ()  => {
       }
       test("user should not be able to login", async () => {
         const res = await request(app)
-      .post("/api/v1/auth/login")
+      .post("https://www.apidevstory.herokuapp.com/api/v1/auth/login")
       .set("content-type", "application/json")
       .set("authorization", process.env.FK_TOKEN)
       .send(loginDetails);
@@ -98,7 +97,7 @@ describe("Userctrl", ()  => {
       }
       test( "user should not be able to login", async () => {
         const res = await request(app)
-        .post("/api/v1/auth/login")
+        .post("https://www.apidevstory.herokuapp.com/api/v1/auth/login")
         .set("content-type", "application/json")
         .set("authorization", process.env.TOKEN)
         .send(loginDetails);
@@ -114,7 +113,7 @@ describe("Userctrl", ()  => {
 
         test( "user should not be able to login", async () => {
           const res = await request(app)
-          .post("/api/v1/auth/login")
+          .post("https://www.apidevstory.herokuapp.com/api/v1/auth/login")
           .set("content-type", "application/json")
           .set("authorization", process.env.FK_TOKEN)
           .send(loginDetails);

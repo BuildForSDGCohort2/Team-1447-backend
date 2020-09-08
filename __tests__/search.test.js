@@ -7,7 +7,7 @@ describe("Get author name with valid Token", () => {
     describe("Search for author with valid Token", () => {
         test( "GET/search/?", async () => {
             const res = await request(app)
-            .get("/api/v1/search?q=KWAHI")
+            .get("https://apidevstory.herokuapp.com/api/v1/search?q=KWAHI")
             .set("Accept", "application/json")
             .set("authorization", process.env.TOKEN);
             expect(res.statusCode).toBe(200);
@@ -19,7 +19,7 @@ describe("Get author name with valid Token", () => {
 
         test( "GET/search/?", async () => {
             const res = await request(app)
-            .get("/api/v1/search?q=KWAHI")
+            .get("https://apidevstory.herokuapp.com/api/v1/search?q=KWAHI")
             .set("Accept", "application/json")
             .set("authorization", process.env.FK_TOKEN);
             expect(res.statusCode).not.toBe(200);
