@@ -358,7 +358,7 @@ class UserCtrl{
                 }
                 res.status(404).json({
                     status: "error",
-                    message: "Account doesn"t exists"
+                    message: "Account doesn't exists"
                 })
             }
         }catch (error) {
