@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "build": "parcle build ./server.js",
+    "build": "parcel build ./server.js",
     "pretest": "node buildScripts/testMessage",
     "test": "jest",
     "test:watch": "jest --watch",
