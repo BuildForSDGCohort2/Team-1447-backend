@@ -7,11 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "pretest": "node buildScripts/testMessage",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cover": "jest --coverage",
-    "prestart": "node buildScripts/startMessage",
     "start": "node server.js"
   },
   "repository": {
