@@ -5,7 +5,7 @@ const compression = require("compression");
 const cors = require("cors");
 const morgan = require("morgan");
 const fs = require("fs");
-const db = require("./src/models/database");
+const path = require("path");
 const user = require("./src/routes/userRoute");
 const article = require("./src/routes/articleRoute");
 const media = require("./src/routes/mediaRoute"); 
@@ -47,7 +47,7 @@ app.use(compression());
 app.use(limiter); // This is applicable to all routes
 app.use(cors(origin));
 
-app.use(morgan(':method   :url    :status   is done in    :response-time ms', {stream: accessLogStream}));
+app.use(morgan(':method   :url    :status     is done in    :response-time ms', {stream: accessLogStream}));
 
 // homepage
 app.get("/", (req, res) => {

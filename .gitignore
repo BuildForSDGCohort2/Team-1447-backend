@@ -5,6 +5,7 @@
 /buildScripts
 # coverage
 /coverage
+.cache
 # production build
 /build
 # file ext

@@ -245,7 +245,7 @@ class UserCtrl{
 
                   // Mail information for recipient
                   var mailOptions = {
-                    from: "hakanboysido@gmail.com",
+                    from: process.env.SENDER_EMAIL,
                     to: email,
                     subject: "Reset Password Link - Devstory",
                     text: `<p>You requested to reset your password. 
