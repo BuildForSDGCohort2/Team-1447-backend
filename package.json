@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "This is the backend of devstory",
   "main": "server.js",
+  "engines": {
+    "yarn": "1.x"
+  },
   "directories": {
     "test": "test"
   },
