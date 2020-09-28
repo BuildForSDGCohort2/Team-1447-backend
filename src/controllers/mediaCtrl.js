@@ -97,7 +97,7 @@ class MediaCtrl{
      * @memberof MediaCtrl
      */
 
-        static async getOneGif(req, res, next) {
+        static async getOneMedia(req, res, next) {
             try {
                 const mediaId = Number(req.params.mediaId);
                 // console.log(req.params)

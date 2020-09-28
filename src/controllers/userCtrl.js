@@ -97,7 +97,7 @@ class UserCtrl{
     // User login logic
     static async login(req, res){
         try {
-            const {loginData, password}= req.body;
+            const {loginData, password} = req.body;
 
             // Check if email exists in the dp
             let result = await pool.query(`SELECT user_id, email, is_admin, 
@@ -124,6 +124,7 @@ class UserCtrl{
                            res.status(500).json({ status: 500, error: "Expired Authorization ", error});
                         }else {
                             res.status(200).json({
+                                status: "success",
                                 data: {
                                     message: "You have logged in successfully"
                                 }
@@ -132,28 +133,29 @@ class UserCtrl{
                     });
                 }else {
                     jwt.sign({ loginData }, process.env.TOKEN_SECRET, { expiresIn: "365d" }, (err, token) => {
-                        console.log(token)
                         if (err){
                             res.status(404).json({
                                 status: "error",
                                 message: "Unable to generate token"
                             })
+                        }else{
+                            res.status(200).json({
+                                status: "success",
+                                data: {
+                                    token,
+                                    message: "You have logged in successfully",
+                                    user: result.rows
+                            }
+                            });   
                         }
-                        res.status(200).json({
-                        data: {
-                            token,
-                            message: "You have logged in successfully",
-                            user: result.rows
-                        }
-                        });
                     });
-                    }
-                } else{
-                    res.status(404).json({
-                    data:{
+                }
+            }else {
+                res.status(404).json({
+                data:{
                         message: "Your Email/Username and password is Incorrect"
-                    }
-                })
+                }
+             })
             }
         }catch (error) {
             console.log(error)
@@ -180,7 +182,7 @@ class UserCtrl{
             
             const userId = req.params.userId;
             const query = `SELECT first_name, last_name, email, date_of_birth, avatar_url, is_admin, 
-                           password, phone_number, gender, user_name FROM users WHERE email=$1`
+                           password, phone_number, gender, user_name FROM users WHERE email=$1`;
 
             const result = await pool.query( query, [userId]);
 
