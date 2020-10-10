@@ -35,7 +35,7 @@ var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {
 // to make sure only your domain is the only one that has access
 const isProduction = process.env.NODE_ENV === "production"
 const origin = {
-  origin: isProduction ? "https://.devssstory.netlify.app" : "*",
+  origin: isProduction ? "https://devssstory.netlify.app" : "*",
 }
 
 // setup bodyParser
