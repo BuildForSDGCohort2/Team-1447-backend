@@ -69,7 +69,6 @@ class UserCtrl{
                             data: {
                                 token: token, 
                                 message: "User created successfully",
-                                user: response.rows
                         }
                     });
                 });

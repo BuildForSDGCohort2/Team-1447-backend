@@ -72,54 +72,81 @@ class Article{
         // const userId = req.params.id
         const userId = req.id;
         // console.log(userId);
-        try {
-            //! give each attribute distinct name
-            const query = `
-            SELECT article_id , article_header, article_posted_by, article_date_of_pub, comment_id, comment, 
-            comments_date_of_pub, comments_posted_by, article_posted_on, media_id, media_caption,
-            media_url, user_name, user_id FROM article LEFT JOIN comments ON article_posted_on=article_id 
-            FULL JOIN media ON media_id=media_posted_on LEFT JOIN users ON user_id=comments_posted_by                   
-            `;
-            // const result = await pool.query("SELECT article_header, article_body, date_of_pub, avatar_url FROM article INNER JOIN users ON user_id = posted_by WHERE posted_by=$1", [userId]);  
-            // const result = await pool.query("SELECT * FROM article WHERE posted_by=$1 ORDER BY article_id ", [userId]); 
-            const result = await pool.query(query);
-            // SELECT article_id, article_header, article.posted_by, article.date_of_pub, comment_id, comment, comments.date_of_pub, comments.posted_by, article_posted_on, media_posted_on, user_name, user_id FROM article LEFT JOIN comments ON article_id=comments.media_posted_on LEFT JOIN users ON comments.posted_by=user_id ORDER BY article.date_of_pub, comments.date_of_pub DESC;
-            // SELECT article_id , article_header, article.posted_by, article.date_of_pub, comment_id, comment, comments.date_of_pub, comments.posted_by, article_posted_on, media_id, media_caption, media_url, user_name, user_id FROM article FULL JOIN comments ON article_posted_on=article_id FULL JOIN media ON media_posted_on=media_id FULL JOIN users ON user_id=comments.posted_by;  
-            if (result.rowCount > 0) {
-                // set object for caching
+        try { 
+                //! give each attribute distinct name
+                // const query = `
+                // SELECT article_id , article_header, article.posted_by, article_body, article.date_of_pub, comment_id, comment, 
+                // comments.date_of_pub, comments.posted_by, article_posted_on, media_id, media_caption,
+                // media_url, user_name, user_id FROM article LEFT JOIN comments ON article_posted_on=article_id 
+                // LEFT JOIN media ON media_id=media_posted_on LEFT JOIN users ON ${userId}=comments.posted_by 
+                // WHERE user_id=${userId} ORDER BY article.date_of_pub DESC`;
+                // const result = await pool.query("SELECT article_header, article_body, date_of_pub, avatar_url FROM article INNER JOIN users ON user_id = posted_by WHERE posted_by=$1", [userId]);  
+                // const result = await pool.query("SELECT * FROM article WHERE posted_by=$1 ORDER BY article_id ", [userId]); 
+                // const result = await pool.query(query);
+                // SELECT article_id, article_header, article.posted_by, article.date_of_pub, comment_id, comment, comments.date_of_pub, comments.posted_by, article_posted_on, media_posted_on, user_name, user_id FROM article LEFT JOIN comments ON article_id=comments.media_posted_on LEFT JOIN users ON comments.posted_by=user_id ORDER BY article.date_of_pub, comments.date_of_pub DESC;
+                // SELECT article_id , article_header, article.posted_by, article.date_of_pub, comment_id, comment, comments.date_of_pub, comments.posted_by, article_posted_on, media_id, media_caption, media_url, user_name, user_id FROM article FULL JOIN comments ON article_posted_on=article_id FULL JOIN media ON media_posted_on=media_id FULL JOIN users ON user_id=comments.posted_by;  
+                
+                const result1 = await pool.query(
+                    `SELECT article_id, article_header, article_body, article.date_of_pub, article.posted_by FROM 
+                    article WHERE article.posted_by=${userId}`); //! Set a limit
+                    // console.log(result1.rows)
+                if (result1.rowCount > 0) {
+                    // set object for caching
+                   
+                let modArray = [];
+    
+                for (let i = 0; i < result1.rowCount; i++) {
+                    let articleId = result1.rows[i].article_id
+                    const mod = await pool.query(`SELECT * FROM comments WHERE article_posted_on=${articleId} ORDER BY date_of_pub DESC`);
+                    if (mod.rowCount > 0) {
+                        result1.rows[i].comments = mod.rows
+                        modArray.push(result1.rows[i])
+                    }
+                    modArray.push(result1.rows[i])
+                }
+
                 res.locals = {
                     status: "success",
                     data: {
-                        result: result.rows
+                        result: modArray
                     }
                 }
-                // server response
-                res.status(200).json({
+    
+                return res.status(200).json({
                     status: "success",
-                    data: {
-                        result: result.rows
-                    }
-                });
-
-            }else {
-                res.status(404).json({
+                    code: 200,
+                    data: modArray,
+                })
+            
+                    // server response
+                    // console.log(result.rows)
+                    // res.status(200).json({
+                    //     status: "success",
+                    //     data: {
+                    //         result: result.rows
+                    //     }
+                    // });
+    
+                }else {
+                    res.status(404).json({
+                        status: "error",
+                        code: 404,
+                        data: {
+                            message: "Articles not found",
+                        }
+                    });
+                }
+            } catch (error) {
+                console.log(error)
+                res.status(500).json({
                     status: "error",
-                    data: {
-                        message: "Articles not found"
+                    code: 500,
+                    data:{
+                        message: "Something went wrong",
                     }
                 });
             }
-        } catch (error) {
-            console.log(error)
-            res.status(500).json({
-                status: "error",
-                data:{
-                    message: "Something went wrong",
-                    error
-                }
-            });
-        }
-        next();
+            next();
     }
 
     /**
