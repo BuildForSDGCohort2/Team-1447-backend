@@ -45,7 +45,7 @@ app.use(express.urlencoded({extended: false}));
 // app.use(helmet());
 app.use(compression());
 // app.use(limiter); // This is applicable to all routes
-// app.use(cors(origin));
+app.use(cors());
 
 app.use(morgan(':method   :url    :status     is done in    :response-time ms', {stream: accessLogStream}));
 
