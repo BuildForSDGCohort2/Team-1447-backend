@@ -1,5 +1,4 @@
 const app = require("../app");
-const cloudinary = require("../middlewares/cloudinary-config");
 const pool = require("../src/models/database");
 const request = require("supertest");
 require("dotenv").config();

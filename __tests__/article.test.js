@@ -15,7 +15,7 @@ describe("Article ctrl", () => {
 
         test( "author should be able to post an article",  async () => {
             const res = await request(app)
-            .post("https://www.apidevstory.herokuapp.com/api/v1/create/article")
+            .post("https://apidevstory.herokuapp.com/api/v1/create/article")
             .set("content-type", "application/json")
             .set("authorization", process.env.TOKEN)
             .send(article);
@@ -35,7 +35,7 @@ describe("Article ctrl", () => {
 
         test( "POST /article",  async () => {
             const res = await request(app)
-            .post("https://www.apidevstory.herokuapp.com/api/v1/create/article")
+            .post("https://apidevstory.herokuapp.com/api/v1/create/article")
             .set("content-type", "application/json")
             .set("authorization", process.env.FK_TOKEN)
             .send(article);
@@ -48,7 +48,7 @@ describe("Article ctrl", () => {
         test( "author should be able to view all article written", async () => {
 
         const res = await request(app)
-        .get("https://www.apidevstory.herokuapp.com/api/v1/articles")
+        .get("https://apidevstory.herokuapp.com/api/v1/articles")
         .set("content-type", "application/json")
         .set("authorization", process.env.TOKEN);
         expect(res.statusCode).toBe(200);
@@ -59,7 +59,7 @@ describe("Article ctrl", () => {
 
         test( "author should be able to view all article written", async () => {
             const res = await request(app)
-            .get("https://www.apidevstory.herokuapp.com/api/v1/feed")
+            .get("https://apidevstory.herokuapp.com/api/v1/feed")
             .set("Accept", "application/json")
             .set("content-type", "application/json")
             .set("authorization", process.env.FK_TOKEN);
@@ -83,7 +83,7 @@ describe("Article ctrl", () => {
 
         test( "GET /articles/:articleId" , async () => {
             const res = await request(app)
-            .get(`https://www.apidevstory.herokuapp.com/api/v1/articles/${articleId}`)
+            .get(`https://apidevstory.herokuapp.com/api/v1/articles/${articleId}`)
             .set("content-type", "application/json")
             .set("authorization", process.env.TOKEN);
             expect(res.statusCode).toBe(200);
@@ -105,7 +105,7 @@ describe("Article ctrl", () => {
         });
         test( "POST /articles/:articleId", async () => {
             const res = await request(app)
-            .get(`https://www.apidevstory.herokuapp.com/api/v1/articles/${articleId}`)
+            .get(`https://apidevstory.herokuapp.com/api/v1/articles/${articleId}`)
             .set("content-type", "application/json")
             .set("authorization", process.env.FK_TOKEN);
             expect(res.statusCode).not.toBe(200);
@@ -137,7 +137,7 @@ describe("Article ctrl", () => {
             }
 
             const res = await request(app)
-            .patch(`https://www.apidevstory.herokuapp.com/api/v1/article/edit/${articleId}`)
+            .patch(`https://apidevstory.herokuapp.com/api/v1/article/edit/${articleId}`)
             .set("content-type", "application/json")
             .set("authorization", process.env.TOKEN)
             .send(article);
@@ -170,7 +170,7 @@ describe("Article ctrl", () => {
             };
 
             const res = await request(app)
-            .patch(`https://www.apidevstory.herokuapp.com/api/v1/article/edit/${articleId}`)
+            .patch(`https://apidevstory.herokuapp.com/api/v1/article/edit/${articleId}`)
             .set("content-type", "application/json")
             .set("authorization", process.env.FK_TOKEN)
             .send(article);
@@ -194,7 +194,7 @@ describe("Article ctrl", () => {
 
         test( "DELETE /articles/delete/:articleId", async () => {
             const res = await request(app)
-            .delete(`https://www.apidevstory.herokuapp.com/api/v1/articles/delete/${articleId}`)
+            .delete(`https://apidevstory.herokuapp.com/api/v1/articles/delete/${articleId}`)
             .set("content-type", "application/json")
             .set("authorization", process.env.TOKEN);
             expect(res.statusCode).toBe(200);
@@ -218,7 +218,7 @@ describe("Article ctrl", () => {
 
         test("DELETE /api/v1/delete/articles/:articleId", async () => {
             const res = await request(app)
-            .delete(`https://www.apidevstory.herokuapp.com/api/v1/articles/delete/${articleId}`)
+            .delete(`https://apidevstory.herokuapp.com/api/v1/articles/delete/${articleId}`)
             .set("content-type", "application/json")
             .set("authorization", process.env.FK_TOKEN);
             expect(res.statusCode).not.toBe(200);
