@@ -6,12 +6,18 @@ const cors = require("cors");
 const morgan = require("morgan");
 const fs = require("fs");
 const path = require("path");
-const user = require("./src/routes/userRoute");
-const article = require("./src/routes/articleRoute");
-const media = require("./src/routes/mediaRoute"); 
+// const user = require("./src/routes/userRoute");
+const user = require("./src/routes/userRoute_changed");
+// const article = require("./src/routes/articleRoute");
+const article = require("./src/routes/articleRoute_changed");
+// const media = require("./src/routes/mediaRoute");
+const media = require("./src/routes/mediaRoute_changed");
 // const admin = require("./routes/admin");
-const comment = require("./src/routes/commentRoute");
-const search = require("./src/routes/searchRoute");
+// const comment = require("./src/routes/commentRoute");
+const comment = require("./src/routes/commentRoute_changed");
+// const search = require("./src/routes/searchRoute");
+const search = require("./src/routes/searchRoute_changed");
+
 
 // initialize express
 const app = express();
@@ -27,7 +33,7 @@ const postLimiter = rateLimit({
 // This is a limiter for the whole request
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
-    max: 5, // 5 requests,
+    max: 100, // 100 requests,
 });
 
 // Creates a writeable stream to the file instead of process.stdout
@@ -45,7 +51,7 @@ app.use(express.urlencoded({extended: false}));
 
 // app.use(helmet());
 app.use(compression());
-// app.use(limiter); // This is applicable to all routes
+app.use(limiter); // This is applicable to all routes
 app.use(cors(origin));
 
 app.use(morgan(':method   :url    :status     is done in    :response-time ms', {stream: accessLogStream}));

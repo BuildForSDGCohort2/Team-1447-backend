@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Auth = require("../../middlewares/auth"); 
-const UserCtrl = require("../controllers/userCtrl");
+const UserCtrl = require("../controllers/userCtrl_changed");
 
 // Routes for userctrl
 router.post("/auth/signup", UserCtrl.creatUser);

@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const pool = require("../models/database");
+const pool = require("../models/database_changed");
 const nodeMailer = require("nodemailer")
 
 
@@ -20,15 +20,15 @@ class UserCtrl{
         
         const {
 
-            firstName, 
-            lastName, 
-            dateOfBirth, 
+            first_name, 
+            last_name, 
+            date_of_birth, 
             email, 
-            phonenumber, 
+            phone_number, 
             gender, 
             username, 
-            isAdmin, 
-            avatarUrl, 
+            is_admin, 
+            avatar_url, 
             password
         } = req.body;
         
@@ -61,14 +61,14 @@ class UserCtrl{
                     VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
                     // console.log(userEmail, "3")
                     const values = [
-                        firstName,
-                        lastName,
+                        first_name,
+                        last_name,
                         email,
-                        dateOfBirth,
-                        avatarUrl,
-                        isAdmin,
+                        date_of_birth,
+                        avatar_url,
+                        is_admin,
                         hash,
-                        phonenumber,
+                        phone_number,
                         gender,
                         username
                     ];
@@ -138,14 +138,14 @@ class UserCtrl{
     static async login(req, res){
         try {
             const {email, password} = req.body;
-            console.log(email, password)
+            // console.log(email, password)
 
-            // Check if email exists in the dp
+            // Check if email exists in the DB
             let result = await pool.query(`SELECT user_id, email, is_admin, 
             password, user_name FROM users WHERE email=$1`, [email]);
-            console.log(result.rows[0])
+            // console.log(result.rows[0])
 
-            let  {user_id, is_admin, user_name:username} = result.rows[0];
+            let {user_id, is_admin, user_name:username} = result.rows[0];
             // let email = result.rows[0].email; 
 
             // console.log(user_id, is_admin, username, email)
@@ -156,7 +156,8 @@ class UserCtrl{
 
             // Compare both hashes to check validity
             const compare = await bcrypt.compare(password, dbPasswordHash);
-    
+            
+            // Checks if email already exists in DB
             if(result.rowCount <= 0){
                res.status("404").json({
                    status: "error",
@@ -165,7 +166,7 @@ class UserCtrl{
             }else if(compare){
                 jwt.sign({ email, username, is_admin, user_id }, process.env.TOKEN_SECRET, { expiresIn: "365d" }, (err, token) => {
                     if (err){
-                        console.log('enter wrongly')
+                        // console.log('enter wrongly')
                         res.status(404).json({
                             status: "error",
                             message: "Unable to generate token"
@@ -189,12 +190,11 @@ class UserCtrl{
              })
             }
         }catch (error) {
-            console.log(error)
+            // console.log(error)
             res.status(500).json({
                 data:{
                     status: "error",
                     message: "Something went Wrong",
-                    error
                 }
             });
         }
@@ -242,8 +242,10 @@ class UserCtrl{
 
     static async editProfile(req, res) {      
         const { email, phone_number } = req.body;
+        console.log(email, phone_number, req.id)
         
         const result = await pool.query('SELECT email, phone_number from users WHERE user_id=$1', [req.id]);
+        console.log(result.rows);
         
         try {
             if (result.rowCount > 0){
@@ -297,7 +299,8 @@ class UserCtrl{
     }catch (error) {
         res.status(500).json({
             status: 'error',
-            message: 'Something Unexpected Happened'
+            message: 'Something Unexpected Happened',
+            error
         })
     }
 }
@@ -357,7 +360,6 @@ class UserCtrl{
                 }
             });
             }else{
-
                 res.status(404).json({
                     status: "error",
                     message: "No Email associated with Account"
@@ -382,11 +384,10 @@ class UserCtrl{
     static async changePassword(req, res) {
         try {
             const {password} = req.body;
-            const id = req.id
             const salt = await bcrypt.genSalt(10);
             const hash = await bcrypt.hash(password, salt);
             if (hash) {
-                const result = await pool.query("UPDATE users SET password=$1  WHERE user_id=$2", [hash, id]);
+                const result = await pool.query("UPDATE users SET password=$1  WHERE user_id=$2", [hash, req.id]);
                 
                 if (result.rowCount > 0) {
                     res.setHeader("Content-Encoding", "gzip");
@@ -419,40 +420,42 @@ class UserCtrl{
 
     static async resetPassword(req, res) {
         try{
-            const id = req.id
             const {oldPassword} = req.body;
             const {retryNewPassword} = req.body
             if (oldPassword && retryNewPassword) {
-                const result = await pool.query("SELECT password FROM users WHERE user_id=$1", [id]);
+                const result = await pool.query("SELECT password FROM users WHERE user_id=$1", [req.id]);
                 if (result.rowCount > 0) {
-                    const compare = await bcrypt.compare(oldPassword, result.rows[0].password)
+                    const compare = await bcrypt.compare(oldPassword, result.rows[0].password);
                     if (compare) {
                         const salt = await bcrypt.genSalt(10);
                         const hash = await bcrypt.hash(retryNewPassword, salt)
                         
                         if (hash) {
-                            const result = await pool.query("UPDATE users SET password=$1 WHERE user_id=$2", [hash, id]);
+                            const result = await pool.query("UPDATE users SET password=$1 WHERE user_id=$2", [hash, req.id]);
                             if (result.rowCount > 0) {
                                 res.status(200).json({
                                     status: "success",
                                     message: "Your password has been changed successfully"
-                                })
+                                });
+                            }else{
+                                res.status(404).json({
+                                    status: "error",
+                                    message: "Password has not been changed"
+                                });
                             }
-                            res.status(404).json({
-                                status: "error",
-                                message: "Password has not been changed"
-                            })
                         }
-                    } 
+                    } else{
+                        res.status(404).json({
+                            status: "error",
+                            message: "Password is not correct"
+                        });
+                    }
+                }else {
                     res.status(404).json({
                         status: "error",
-                        message: "Password is not correct"
-                    }) 
+                        message: "Account doesn't exists"
+                    });
                 }
-                res.status(404).json({
-                    status: "error",
-                    message: "Account doesn't exists"
-                })
             }
         }catch (error) {
             res.status(500).json({
