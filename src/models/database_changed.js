@@ -1,6 +1,8 @@
 const {Pool} = require("pg");
 require("dotenv").config()
 
+// ! REMOVE "dotenv" dep
+// ! ADD ENV VARS IN HEROKU (process.env.DATABASE_URL) AND (process.env.TOKEN_SECRET)
 // const isProduction = process.env.NODE_ENV === "production";
 //connection config for production
 // const pool = new Pool({

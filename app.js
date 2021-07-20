@@ -6,16 +6,10 @@ const cors = require("cors");
 const morgan = require("morgan");
 const fs = require("fs");
 const path = require("path");
-// const user = require("./src/routes/userRoute");
 const user = require("./src/routes/userRoute_changed");
-// const article = require("./src/routes/articleRoute");
 const article = require("./src/routes/articleRoute_changed");
-// const media = require("./src/routes/mediaRoute");
 const media = require("./src/routes/mediaRoute_changed");
-// const admin = require("./routes/admin");
-// const comment = require("./src/routes/commentRoute");
 const comment = require("./src/routes/commentRoute_changed");
-// const search = require("./src/routes/searchRoute");
 const search = require("./src/routes/searchRoute_changed");
 
 
