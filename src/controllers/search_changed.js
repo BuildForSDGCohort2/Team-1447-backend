@@ -1,4 +1,4 @@
-const pool = require("../models/database_changed");
+const {pool} = require("../models/database_changed");
 
 module.exports = async (req, res) => {
     

@@ -11,10 +11,19 @@ const article = require("./src/routes/articleRoute_changed");
 const media = require("./src/routes/mediaRoute_changed");
 const comment = require("./src/routes/commentRoute_changed");
 const search = require("./src/routes/searchRoute_changed");
+const {usersF, articleF, mediaF, comments} = require('./src/models/database_changed')
 
 
 // initialize express
 const app = express();
+
+const createTable = async () => {
+  await usersF();
+  await articleF();
+  await mediaF();
+  await comments();
+}
+createTable();
 
 app.disable("x-powered-by");
 
